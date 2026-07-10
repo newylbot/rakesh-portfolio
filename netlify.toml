@@ -1,0 +1,18 @@
+# Netlify config for a Next.js (App Router) site.
+# Vercel needs NO config — this file only matters if you deploy to Netlify.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Official plugin: gives Netlify full Next.js App Router support
+# (SSR, API routes, image optimization). Netlify installs it automatically
+# when it detects Next.js, but pinning it here is explicit and reliable.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Set NEXT_PUBLIC_SITE_URL (and optional CONTACT_FORM_ENDPOINT) in the
+# Netlify dashboard under Site settings → Environment variables.
