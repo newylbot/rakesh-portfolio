@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useReducedMotion } from "framer-motion";
 
 const roles = [
   "an Electrical Engineering graduate",
@@ -11,17 +10,15 @@ const roles = [
   "a Software and Simulation builder",
 ];
 
-/** Types a full role, pauses, deletes it fully, then loops forever. */
+/** Full-role typing loop: type, pause, erase, advance, repeat forever. */
 export function RoleTypewriter({ className = "" }: { className?: string }) {
-  const reduce = useReducedMotion();
   const [roleIndex, setRoleIndex] = React.useState(0);
   const [length, setLength] = React.useState(0);
   const [phase, setPhase] = React.useState<"typing" | "hold" | "deleting">("typing");
 
   React.useEffect(() => {
-    if (reduce) { setLength(roles[0].length); return; }
     const role = roles[roleIndex];
-    const delay = phase === "hold" ? 1350 : phase === "deleting" ? 32 : 58;
+    const delay = phase === "hold" ? 1250 : phase === "deleting" ? 30 : 55;
     const timer = window.setTimeout(() => {
       if (phase === "typing") {
         if (length < role.length) setLength((value) => value + 1);
@@ -36,35 +33,39 @@ export function RoleTypewriter({ className = "" }: { className?: string }) {
       }
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [length, phase, roleIndex, reduce]);
+  }, [length, phase, roleIndex]);
 
   return (
-    <span className={className} aria-label={`I am ${roles[roleIndex]}`}>
-      <span aria-hidden="true">I am {roles[roleIndex].slice(0, length)}</span>
+    <span className={`block min-h-[2rem] ${className}`} aria-live="polite">
+      <span className="font-semibold text-text">Rakesh Kumar Behera</span>
+      <span className="mx-2 text-text-muted" aria-hidden="true">-</span>
+      <span>I am {roles[roleIndex].slice(0, length)}</span>
       <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
     </span>
   );
 }
 
-/** Types the resume name once and keeps the exact two-line editorial layout. */
+/** One-shot name typing with the approved RAKESH / KUMAR BEHERA layout. */
 export function ResumeNameTypewriter() {
-  const reduce = useReducedMotion();
-  const text = "RAKESH\nKUMAR BEHERA";
-  const [length, setLength] = React.useState(reduce ? text.length : 0);
+  const full = "RAKESH\nKUMAR BEHERA";
+  const [length, setLength] = React.useState(0);
 
   React.useEffect(() => {
-    if (reduce || length >= text.length) return;
-    const timer = window.setTimeout(() => setLength((value) => value + 1), 72);
+    if (length >= full.length) return;
+    const timer = window.setTimeout(() => setLength((value) => value + 1), 68);
     return () => window.clearTimeout(timer);
-  }, [length, reduce, text.length]);
+  }, [length, full.length]);
 
-  const shown = text.slice(0, length);
-  const [first = "", second = ""] = shown.split("\n");
+  const shown = full.slice(0, length);
+  const newline = shown.indexOf("\n");
+  const first = newline >= 0 ? shown.slice(0, newline) : shown;
+  const second = newline >= 0 ? shown.slice(newline + 1) : "";
+
   return (
-    <h1 className="font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
+    <h1 className="min-h-[1.72em] font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
       <span aria-hidden="true">{first}</span>
-      {shown.includes("\n") ? <><br /><span aria-hidden="true">{second}</span></> : null}
-      {length < text.length ? <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" /> : null}
+      {newline >= 0 ? <><br /><span aria-hidden="true">{second}</span></> : null}
+      {length < full.length ? <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" /> : null}
     </h1>
   );
 }
