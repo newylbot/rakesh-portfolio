@@ -1,12 +1,1 @@
-import { createMetadata } from "@/lib/seo";
-import { AnimatedProjects } from "@/components/projects/animated-projects";
-
-export const metadata = createMetadata({
-  title: "Projects",
-  description: "Selected work and case studies, including the in-progress Lumino XP.",
-  path: "/projects",
-});
-
-export default function ProjectsPage() {
-  return <AnimatedProjects />;
-}
+import {createMetadata} from "@/lib/seo";import {VerifiedProjects} from "@/components/projects/verified-projects";export const metadata=createMetadata({title:"Projects",description:"Verified electrical, automation and software projects by Rakesh Kumar Behera.",path:"/projects"});export default function Page(){return <VerifiedProjects/>}
