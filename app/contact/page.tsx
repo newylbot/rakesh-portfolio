@@ -1,4 +1,1 @@
-import { createMetadata } from "@/lib/seo";
-import { ContactExperience } from "@/components/pages/animated-pages";
-export const metadata=createMetadata({title:"Contact",path:"/contact"});
-export default function Page(){return <ContactExperience/>}
+import {createMetadata} from "@/lib/seo";import {ContactExperience} from "@/components/pages/animated-pages";import {RouteCta} from "@/components/pages/route-cta";export const metadata=createMetadata({title:"Contact",path:"/contact"});export default function Page(){return <><ContactExperience/><RouteCta kicker="07 / direct line" title="A GOOD TECHNICAL CONVERSATION CAN START HERE." body="Share the role, system or problem. I will reply with clarity, not a generic pitch."/></>}
