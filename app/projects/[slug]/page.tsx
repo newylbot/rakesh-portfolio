@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { siteConfig } from "@/content/site-config";
 import { luminoXp } from "@/content/case-studies/lumino-xp";
 import { createMetadata } from "@/lib/seo";
@@ -24,7 +25,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   });
 }
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
+function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="border-t border-border py-10">
       <h2 className="mb-4 text-h2 font-semibold text-text">{title}</h2>
