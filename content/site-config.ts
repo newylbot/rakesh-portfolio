@@ -1,16 +1,16 @@
 /**
- * SINGLE EDITABLE CONTENT SOURCE
- * -------------------------------------------------------------
- * Update everything about the site here. Components read from this
- * file only — you should never need to edit component code to change
- * copy, links, experience, projects, or skills.
+ * ============================================================================
+ *  SITE CONTENT & CONFIG — SINGLE SOURCE OF TRUTH
+ * ============================================================================
+ *  Edit THIS file to update the whole site. You should not need to touch
+ *  component code for normal content changes.
  *
- * TRUTHFULNESS RULES (keep these):
- *  - Empty string ("") means the link/fact is not known yet.
- *  - "[Confirm / add details]" is an explicit placeholder — keep it
- *    until the real value is confirmed. Do not turn it into a claim.
- *  - Do not invent metrics, users, production/uptime claims, clients,
- *    certificates, or employers.
+ *  TRUTHFULNESS RULES (from the build pack):
+ *   - Keep empty strings ("") for links that are not real yet.
+ *   - Use explicit "[Confirm / add details]" placeholders for unknown facts.
+ *   - Do NOT convert placeholders into real claims until confirmed.
+ *   - Do NOT invent metrics, users, deployments, employers, or certifications.
+ * ============================================================================
  */
 
 export type SkillLevel =
@@ -22,33 +22,59 @@ export type SkillLevel =
   | "Familiar with"
   | "[Confirm / add details]";
 
-export type ProjectStatus = "In progress" | "Planned" | "Live";
+export type ProjectStatus = "In progress" | "Planned" | "Completed";
+
+export interface Skill {
+  name: string;
+  level: SkillLevel;
+}
+
+export interface ExperienceEntry {
+  company: string;
+  role: string;
+  period: string;
+  location: string;
+  type: string;
+  summary: string[];
+  domains?: string[];
+  reflection?: string;
+  evidenceUrl: string;
+}
+
+export interface Project {
+  slug: string;
+  title: string;
+  category: string;
+  status: ProjectStatus;
+  oneLine: string;
+  stack: string[];
+  github: string;
+  demo: string;
+  featured?: boolean;
+  placeholder?: boolean;
+}
 
 export const siteConfig = {
   person: {
     name: "Rakesh Kumar Behera",
-    monogram: "RKB",
+    shortName: "RKB",
     role: "Electrical Engineering Graduate | Industrial Systems & Software Builder",
     headline: "Engineering reliable systems — from the factory floor to the web.",
     altHeadline:
       "I build dependable systems at the intersection of electrical engineering, industrial operations, and software.",
-    bio: "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, industrial safety, automation and SCADA learning. I also build modern software products and backend systems using Rust and web technologies.",
-    supportingParagraph:
+    supporting:
       "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, industrial safety, and automation / SCADA learning. Also building toward backend systems, Rust, APIs, and practical web products with a focus on reliability, clarity, and system behavior.",
+    bio:
+      "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, industrial safety, automation and SCADA learning. I also build modern software products and backend systems using Rust and web technologies.",
     location: "India",
-    availability: "Open to opportunities",
-    availabilityLine:
-      "Based in India — available for remote and on-site opportunities.",
-    // Leave blank until confirmed — the UI shows graceful placeholders when empty.
+    availabilityLabel: "Open to opportunities",
+    availabilityLine: "Based in India — available for remote and on-site opportunities.",
+    // Leave empty until real. Placeholder states render when these are blank.
     email: "",
     github: "",
     linkedin: "",
     resumeUrl: "",
   },
-
-  // Used for canonical URLs, sitemap, robots and OG metadata.
-  // Overridden by NEXT_PUBLIC_SITE_URL when set.
-  siteUrl: "https://your-domain.com",
 
   nav: [
     { label: "Work", href: "/projects" },
@@ -81,15 +107,15 @@ export const siteConfig = {
   approach: [
     {
       title: "Observe the system",
-      body: "Understand how a system actually behaves — its inputs, failure modes, and constraints — before changing anything.",
+      body: "Before changing anything, understand the process, the environment, and the constraints. Industrial training reinforced the value of looking carefully at how a system behaves in practice before proposing improvements.",
     },
     {
       title: "Build with constraints",
-      body: "Design for the real limits: safety, reliability, cost, and the people who operate the system day to day.",
+      body: "Good engineering decisions are shaped by safety, time, clarity, and maintainability. Whether the context is a shop floor or a backend service, tradeoffs should be explicit rather than hidden.",
     },
     {
       title: "Document what matters",
-      body: "Capture decisions, tradeoffs, and states clearly so the work stays maintainable and trustworthy.",
+      body: "Reliable work should be understandable to someone else. Notes, inspection records, architecture decisions, and clear write-ups help make systems repeatable and trustworthy.",
     },
   ],
 
@@ -108,7 +134,7 @@ export const siteConfig = {
       ],
       domains: ["Quality inspection", "Hardness testing", "Documentation"],
       reflection:
-        "Precision and repeatable documentation matter as much as the measurement itself.",
+        "Reinforced how disciplined observation and honest record-keeping keep a quality process trustworthy.",
       evidenceUrl: "",
     },
     {
@@ -123,7 +149,7 @@ export const siteConfig = {
       ],
       domains: ["Automation", "SCADA", "Control systems"],
       reflection:
-        "Control systems are about disciplined state handling — the same instinct applies to software.",
+        "Connected control-system theory to how monitored industrial processes actually behave.",
       evidenceUrl: "",
     },
     {
@@ -139,31 +165,13 @@ export const siteConfig = {
       ],
       domains: ["Electrical distribution", "Instrumentation", "Industrial safety"],
       reflection:
-        "Safety-first, SOP-driven work is a mindset, not a checklist.",
+        "Grounded electrical fundamentals in real installations and safety-first working practice.",
       evidenceUrl: "",
     },
-    {
-      company: "Education — B.Tech Electrical Engineering",
-      role: "Bachelor's degree in Electrical Engineering",
-      period: "Completed 2026",
-      location: "India",
-      type: "Education",
-      summary: [
-        "Core electrical engineering foundation with a systems and reliability focus",
-        "Complemented by self-directed software and backend learning",
-      ],
-      domains: ["Electrical engineering", "Systems thinking"],
-      reflection:
-        "Formal EE grounding paired with hands-on software curiosity.",
-      evidenceUrl: "",
-    },
-  ],
-
-  experienceSynthesis:
-    "Across industrial quality, automation training, and steel-plant vocational work, one theme repeats: reliable systems come from clear observation, disciplined documentation, and respect for real-world constraints. I carry that same discipline into the software and backend systems I build.",
+  ] as ExperienceEntry[],
 
   education: {
-    degree: "B.Tech / Bachelor's degree in Electrical Engineering",
+    degree: "B.Tech / Bachelor’s degree in Electrical Engineering",
     completion: "2026",
     location: "India",
     institution: "[Confirm / add details]",
@@ -176,87 +184,144 @@ export const siteConfig = {
       slug: "lumino-xp",
       title: "Lumino XP",
       category: "Product concept / backend & systems",
-      status: "In progress" as ProjectStatus,
-      featured: true,
+      status: "In progress",
       oneLine:
-        "An online test / CBT-platform direction being explored with careful attention to system design and Rust-backend interest.",
+        "An online test / CBT-platform direction being explored with careful attention to system design and a Rust-backend interest.",
       stack: ["Rust [Confirm / add details]", "APIs [Confirm / add details]", "Web systems"],
       github: "",
       demo: "",
+      featured: true,
     },
     {
       slug: "project-2",
       title: "Project 2",
-      category: "Placeholder",
-      status: "Planned" as ProjectStatus,
-      featured: false,
-      oneLine: "Replace with a real case study.",
+      category: "[Confirm / add details]",
+      status: "Planned",
+      oneLine: "Project slot reserved for a real case study.",
       stack: ["[Confirm / add details]"],
       github: "",
       demo: "",
+      placeholder: true,
     },
     {
       slug: "project-3",
       title: "Project 3",
-      category: "Placeholder",
-      status: "Planned" as ProjectStatus,
-      featured: false,
-      oneLine: "Replace with a real case study.",
+      category: "[Confirm / add details]",
+      status: "Planned",
+      oneLine: "Add a second verified build here.",
       stack: ["[Confirm / add details]"],
       github: "",
       demo: "",
+      placeholder: true,
     },
-  ],
+  ] as Project[],
 
   skills: {
     electricalIndustrial: [
-      { name: "Electrical engineering fundamentals", level: "Working knowledge" as SkillLevel },
-      { name: "Industrial safety awareness", level: "Industrial exposure" as SkillLevel },
-      { name: "Quality inspection exposure", level: "Hands-on exposure" as SkillLevel },
-      { name: "Hardness-testing exposure", level: "Hands-on exposure" as SkillLevel },
-      { name: "Automation and SCADA learning", level: "Learning" as SkillLevel },
+      { name: "Electrical engineering fundamentals", level: "Working knowledge" },
+      { name: "Industrial safety awareness", level: "Industrial exposure" },
+      { name: "Quality inspection exposure", level: "Hands-on exposure" },
+      { name: "Hardness-testing exposure", level: "Hands-on exposure" },
+      { name: "Automation and SCADA learning", level: "Learning" },
     ],
     softwareSystems: [
-      { name: "Rust", level: "Learning" as SkillLevel },
-      { name: "Backend development", level: "Learning" as SkillLevel },
-      { name: "APIs", level: "Learning" as SkillLevel },
-      { name: "Web systems", level: "Learning" as SkillLevel },
-      { name: "Cloud deployment learning", level: "Learning" as SkillLevel },
+      { name: "Rust", level: "Learning" },
+      { name: "Backend development", level: "Learning" },
+      { name: "APIs", level: "Learning" },
+      { name: "Web systems", level: "Learning" },
+      { name: "Cloud deployment learning", level: "Learning" },
     ],
     toolsWorkflow: [
-      { name: "Documentation", level: "Hands-on exposure" as SkillLevel },
-      { name: "Git / GitHub", level: "[Confirm / add details]" as SkillLevel },
-      { name: "HTML / CSS / JavaScript / TypeScript", level: "[Confirm / add details]" as SkillLevel },
+      { name: "Documentation", level: "Hands-on exposure" },
+      { name: "Git / GitHub", level: "[Confirm / add details]" },
+      { name: "HTML / CSS / JavaScript / TypeScript", level: "[Confirm / add details]" },
+    ],
+  } as { electricalIndustrial: Skill[]; softwareSystems: Skill[]; toolsWorkflow: Skill[] },
+
+  about: {
+    intro:
+      "Rakesh Kumar Behera is an Electrical Engineering graduate building a profile at the intersection of industrial systems and modern software. His background combines exposure to quality inspection, safety-first industrial environments, and automation learning with a growing focus on backend systems, Rust, APIs, and practical web products.",
+    introSecondary:
+      "He is best understood not as someone switching between two unrelated tracks, but as someone developing a consistent engineering perspective across physical and digital systems: reliability matters, constraints matter, and documentation matters.",
+    whyEngineering: [
+      "Electrical engineering offers a direct way to understand how real systems behave under constraints. It brings together physical infrastructure, control, safety, process discipline, and the need to make dependable decisions when failure has consequences.",
+      "That perspective continues to shape the way Rakesh approaches software. He is interested in systems that are understandable, maintainable, and clear about their tradeoffs rather than systems that appear impressive but are difficult to trust.",
+    ],
+    industrialToSoftware: [
+      "Exposure to industrial environments made process, repeatability, and observation feel concrete rather than theoretical. Training around quality checks, equipment, installations, safety practices, and automation concepts created a strong appreciation for how real work is shaped by procedure and constraints.",
+      "That experience naturally led toward an interest in automation, SCADA concepts, backend systems, and web products. Software became interesting not as a separate identity, but as another layer of systems design: inputs, outputs, monitoring, failure modes, and clear operational behavior.",
+    ],
+    principles: [
+      { title: "Safety", body: "Even when learning, safety is not a background detail. Industrial exposure reinforced that careful engineering begins with safe behavior, respect for procedure, and awareness of consequences." },
+      { title: "Clarity", body: "Good work should be understandable by teammates, reviewers, and future maintainers. Clear documentation and explicit assumptions reduce confusion and make collaboration easier." },
+      { title: "Reliability", body: "Whether inspecting components or designing software flows, dependable systems are built through disciplined thinking rather than vague confidence." },
+      { title: "Curiosity", body: "A learning path driven by curiosity about how systems actually function — from electrical infrastructure and industrial processes to application design and backend architecture." },
+      { title: "Documentation", body: "Notes, evidence, architecture write-ups, and process records are not optional extras. They are part of how engineering work becomes reusable and trustworthy." },
+    ],
+    currentFocus: {
+      handsOn: "Quality inspection support, documentation support, vocational training, automation / SCADA learning contexts",
+      software: "Rust, backend development, APIs, web systems, and product-oriented technical case studies",
+      needsConfirmation: "Specific deployed tools, production systems, repositories, or live software links",
+    },
+    beyond: [
+      "Professional interests outside direct project work: [Confirm / add details]",
+      "Reading / study interests: [Confirm / add details]",
+      "Long-term areas of curiosity: industrial systems, dependable software, and engineering documentation",
     ],
   },
 
   now: {
+    intro: "A concise engineering notebook. Starter entries only — no fabricated history.",
     focus: [
-      "Deepening Rust and backend systems fundamentals",
-      "Exploring the Lumino XP product direction and its planned architecture",
-      "Strengthening automation / SCADA understanding",
+      "Deepening Rust and backend fundamentals",
+      "Shaping the Lumino XP architecture and scope",
+      "Continuing automation / SCADA learning",
+      "Strengthening documentation and system-design habits",
     ],
-    // Starter log entries only — clearly marked. Replace with real dated notes.
     log: [
-      {
-        date: "2026-07",
-        note: "Starter entry — replace with a real note. Documenting Lumino XP scope and drawing the planned architecture.",
-      },
-      {
-        date: "2026-06",
-        note: "Starter entry — replace with a real note. Working through Rust ownership and API design basics.",
-      },
+      { date: "2026 — starter entry", note: "Set up this portfolio and defined an honest structure for work, experience, and skills. [Replace with real dated entries as you go.]" },
     ],
   },
 
-  contact: {
-    headline: "Looking for someone dependable?",
-    body: "I'm open to graduate electrical engineering, automation, quality, technical operations, and junior backend / systems roles. Send a message and I'll get back to you.",
-    // Set CONTACT_FORM_ENDPOINT in env to enable real submissions.
-    // With no endpoint and no email, the form uses a graceful placeholder state.
+  proof: {
+    intro: "Strong engineering work is supported by clear evidence and documentation.",
+    // Empty string => rendered as a clean placeholder state, never a fake button.
+    github: "",
+    resume: "",
+    certificates: "",
+    writeups: "Lumino XP case study + future project documentation",
   },
-};
+
+  resume: {
+    summary:
+      "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, safety, and automation / SCADA learning, now building toward backend systems, Rust, APIs, and dependable web products.",
+    pdfNote:
+      "A downloadable PDF resume will appear here once added. Set person.resumeUrl in content/site-config.ts.",
+  },
+
+  finalCta: {
+    headline: "Have a system worth improving?",
+    body: "Invite recruiters, engineering teams, and collaborators to connect around dependable, systems-oriented work.",
+  },
+
+  seo: {
+    description:
+      "Portfolio of Rakesh Kumar Behera — Electrical Engineering graduate and industrial systems & software builder. Reliability, clarity, and system thinking across industrial and software work.",
+    keywords: [
+      "Rakesh Kumar Behera",
+      "Electrical Engineering",
+      "Industrial Systems",
+      "Automation",
+      "SCADA",
+      "Rust",
+      "Backend",
+      "Portfolio",
+    ],
+  },
+} as const;
 
 export type SiteConfig = typeof siteConfig;
-export type ExperienceEntry = (typeof siteConfig.experience)[number];
-export type Project = (typeof siteConfig.projects)[number];
+
+export function getProject(slug: string): Project | undefined {
+  return siteConfig.projects.find((p) => p.slug === slug);
+}
