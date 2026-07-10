@@ -2,15 +2,18 @@
 
 import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 export default function Template({ children }: { children: ReactNode }) {
   const reduce = useReducedMotion();
-  if (reduce) return <>{children}</>;
+  const pathname = usePathname();
+  if (reduce) return <div key={pathname}>{children}</div>;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+      key={pathname}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>

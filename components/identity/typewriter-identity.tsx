@@ -41,12 +41,7 @@ export function RoleTypewriter({ className = "" }: { className?: string }) {
 
   return (
     <span className={`${className} block min-w-0`} aria-live="polite" aria-atomic="true">
-      <span className="whitespace-nowrap">
-        I am{" "}
-        <strong className={current.strong ? "font-extrabold text-primary" : "font-semibold text-secondary"}>
-          {current.text.substring(0, visible)}
-        </strong>
-      </span>
+      <span className="whitespace-nowrap">I am{" "}<strong className={current.strong ? "font-extrabold text-primary" : "font-semibold text-secondary"}>{current.text.substring(0, visible)}</strong></span>
       <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
     </span>
   );
@@ -69,7 +64,7 @@ export function ResumeNameTypewriter() {
     <h1 className="min-h-[1.68em] font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
       <span aria-hidden="true">{first}</span>
       {shown.includes("\n") ? <><br /><span aria-hidden="true">{second}</span></> : null}
-      <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" />
+      <span aria-hidden="true" className="resume-cursor ml-1 inline-block h-[.78em] w-[3px] bg-primary" />
     </h1>
   );
 }
