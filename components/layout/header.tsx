@@ -30,7 +30,7 @@ export function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-bg/85 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
+    <header className="sticky top-0 z-50 border-b border-border bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
         <Link
           href="/"
@@ -40,19 +40,29 @@ export function Header() {
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
-          {siteConfig.nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={pathname === item.href ? "page" : undefined}
-              className={cn(
-                "rounded-md px-3 py-2 text-sm text-text-muted transition hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                pathname === item.href && "text-text",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {siteConfig.nav.map((item) => {
+            const activeItem = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={activeItem ? "page" : undefined}
+                className={cn(
+                  "group relative rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  activeItem && "text-text",
+                )}
+              >
+                {item.label}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute inset-x-3 -bottom-px h-px origin-left bg-primary transition-transform duration-300 ease-out-expo",
+                    activeItem ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+                  )}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -68,7 +78,7 @@ export function Header() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-border text-text transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
           >
             {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>

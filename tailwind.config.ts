@@ -1,11 +1,11 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Colors are defined as space-separated RGB channels in app/globals.css
- * (`--token: R G B`) so Tailwind's `<alpha-value>` opacity modifiers work,
- * e.g. `bg-primary/20`, `border-primary/50`.
+ * Colors are OKLCH. CSS vars in app/globals.css hold "L C H" triples
+ * (e.g. --primary: 60% 0.17 52) so Tailwind's <alpha-value> modifiers work,
+ * e.g. bg-primary/20, border-text/10.
  */
-const token = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+const c = (name: string) => `oklch(var(--${name}) / <alpha-value>)`;
 
 const config: Config = {
   darkMode: "class",
@@ -17,44 +17,47 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: token("bg"),
-        "bg-elevated": token("bg-elevated"),
-        surface: token("surface"),
-        "surface-2": token("surface-2"),
-        text: token("text"),
-        "text-muted": token("text-muted"),
-        border: token("border"),
-        primary: token("primary"),
-        secondary: token("secondary"),
-        accent: token("accent"),
-        success: token("success"),
-        warning: token("warning"),
-        error: token("error"),
-      },
-      borderColor: {
-        DEFAULT: "rgb(var(--border) / 0.12)",
+        bg: c("bg"),
+        "bg-elevated": c("bg-elevated"),
+        surface: c("surface"),
+        "surface-2": c("surface-2"),
+        text: c("text"),
+        "text-muted": c("text-muted"),
+        border: c("border"),
+        primary: c("primary"),
+        "on-primary": c("on-primary"),
+        secondary: c("secondary"),
+        accent: c("accent"),
+        success: c("success"),
+        warning: c("warning"),
+        error: c("error"),
       },
       fontFamily: {
+        display: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       fontSize: {
-        "display-xl": ["clamp(2.8rem, 6vw, 5.5rem)", { lineHeight: "1.04", letterSpacing: "-0.02em" }],
-        "display-lg": ["clamp(2.2rem, 4.8vw, 4rem)", { lineHeight: "1.08", letterSpacing: "-0.02em" }],
-        h1: ["clamp(1.8rem, 3.6vw, 3rem)", { lineHeight: "1.15", letterSpacing: "-0.01em" }],
-        h2: ["clamp(1.5rem, 3vw, 2.2rem)", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
-        h3: ["clamp(1.2rem, 2vw, 1.5rem)", { lineHeight: "1.3" }],
-        "body-lg": ["clamp(1rem, 1.4vw, 1.125rem)", { lineHeight: "1.65" }],
+        "display-xl": ["clamp(3rem, 7vw, 6rem)", { lineHeight: "0.98", letterSpacing: "-0.03em" }],
+        "display-lg": ["clamp(2.4rem, 5.4vw, 4.5rem)", { lineHeight: "1.02", letterSpacing: "-0.03em" }],
+        h1: ["clamp(2rem, 4vw, 3.25rem)", { lineHeight: "1.08", letterSpacing: "-0.02em" }],
+        h2: ["clamp(1.6rem, 3.2vw, 2.4rem)", { lineHeight: "1.12", letterSpacing: "-0.02em" }],
+        h3: ["clamp(1.2rem, 2vw, 1.6rem)", { lineHeight: "1.25", letterSpacing: "-0.01em" }],
+        "body-lg": ["clamp(1.05rem, 1.4vw, 1.2rem)", { lineHeight: "1.65" }],
         body: ["1rem", { lineHeight: "1.7" }],
-        meta: ["0.875rem", { lineHeight: "1.5" }],
+        meta: ["0.8125rem", { lineHeight: "1.5", letterSpacing: "0.02em" }],
       },
       borderRadius: {
-        sm: "8px",
-        md: "12px",
-        lg: "16px",
+        sm: "6px",
+        md: "10px",
+        lg: "14px",
       },
       maxWidth: {
-        "6xl": "72rem",
+        "6xl": "74rem",
+      },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "out-quint": "cubic-bezier(0.22, 1, 0.36, 1)",
       },
     },
   },

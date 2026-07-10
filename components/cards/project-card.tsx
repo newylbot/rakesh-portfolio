@@ -25,11 +25,11 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-all duration-200 hover:-translate-y-0.5 hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-all duration-300 ease-out-expo hover:-translate-y-1 hover:border-primary hover:shadow-[0_18px_40px_-24px_oklch(var(--primary)/0.6)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
-      <span aria-hidden="true" className="absolute left-0 top-0 h-full w-1 bg-primary opacity-70" />
       <div className="relative h-32 overflow-hidden border-b border-border bg-bg-elevated">
-        <CircuitVisual className="absolute inset-0 h-full w-full opacity-70" />
+        <CircuitVisual className="absolute inset-0 h-full w-full opacity-70 transition-transform duration-500 ease-out-expo group-hover:scale-105" />
+        <span aria-hidden="true" className="absolute bottom-0 left-0 h-0.5 w-0 bg-primary transition-all duration-500 ease-out-expo group-hover:w-full" />
       </div>
       <div className="flex flex-1 flex-col p-6">
         <div className="mb-3 flex items-center justify-between gap-3">
@@ -46,11 +46,9 @@ export function ProjectCard({ project }: { project: Project }) {
         <div className="mt-6 flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
             View case study
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-out-expo group-hover:translate-x-1" aria-hidden="true" />
           </span>
-          {project.github ? (
-            <Github className="h-4 w-4 text-text-muted" aria-hidden="true" />
-          ) : null}
+          {project.github ? <Github className="h-4 w-4 text-text-muted" aria-hidden="true" /> : null}
         </div>
       </div>
     </Link>

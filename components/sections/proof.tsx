@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Github, FileText, Award, BookOpen } from "lucide-react";
 import { siteConfig } from "@/content/site-config";
 import { Section, SectionHeader } from "@/components/layout/section";
+import { Reveal } from "@/components/motion/reveal";
 
 function Module({
   icon,
@@ -15,7 +16,7 @@ function Module({
   fallback: string;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border bg-surface p-5">
+    <div className="flex items-center gap-4 rounded-lg border border-border bg-surface p-5 transition-colors hover:border-primary">
       <span className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border text-primary">
         {icon}
       </span>
@@ -35,14 +36,21 @@ function Module({
 
 export function Proof() {
   const p = siteConfig.person;
+  const mods = [
+    { icon: <Github className="h-5 w-5" aria-hidden="true" />, label: "GitHub", href: p.github, fallback: "Add GitHub link" },
+    { icon: <FileText className="h-5 w-5" aria-hidden="true" />, label: "Resume", href: p.resumeUrl, fallback: "Add resume PDF" },
+    { icon: <Award className="h-5 w-5" aria-hidden="true" />, label: "Certificates", href: "", fallback: "Add if available" },
+    { icon: <BookOpen className="h-5 w-5" aria-hidden="true" />, label: "Project write-ups", href: "/projects", fallback: "See projects" },
+  ];
   return (
     <Section className="border-t border-border">
       <SectionHeader eyebrow="Proof" title="Documentation and links" />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Module icon={<Github className="h-5 w-5" aria-hidden="true" />} label="GitHub" href={p.github} fallback="Add GitHub link" />
-        <Module icon={<FileText className="h-5 w-5" aria-hidden="true" />} label="Resume" href={p.resumeUrl} fallback="Add resume PDF" />
-        <Module icon={<Award className="h-5 w-5" aria-hidden="true" />} label="Certificates" href="" fallback="Add if available" />
-        <Module icon={<BookOpen className="h-5 w-5" aria-hidden="true" />} label="Project write-ups" href="/projects" fallback="See projects" />
+        {mods.map((m, i) => (
+          <Reveal key={m.label} delay={i * 70}>
+            <Module icon={m.icon} label={m.label} href={m.href} fallback={m.fallback} />
+          </Reveal>
+        ))}
       </div>
     </Section>
   );

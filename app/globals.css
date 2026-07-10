@@ -3,39 +3,46 @@
 @tailwind utilities;
 
 /*
- * Design tokens as space-separated RGB channels so Tailwind opacity modifiers
- * work (e.g. bg-primary/20). Light theme is the default; .dark overrides.
+ * Instrument / blueprint design system.
+ * Tokens are OKLCH "L C H" triples so Tailwind alpha modifiers work
+ * (e.g. bg-primary/20). Light is the default; .dark overrides.
+ * Neutrals are warm-tinted (hue ~60) for cohesion, never pure gray/black.
  */
 :root {
-  --bg: 250 247 242;
-  --bg-elevated: 243 238 232;
-  --surface: 255 255 255;
-  --surface-2: 247 242 236;
-  --text: 28 21 18;
-  --text-muted: 115 107 102;
-  --border: 28 21 18;
-  --primary: 79 70 229;
-  --secondary: 249 115 22;
-  --accent: 13 148 136;
-  --success: 5 150 105;
-  --warning: 217 119 6;
-  --error: 220 38 38;
+  --bg: 97% 0.008 85;
+  --bg-elevated: 94% 0.01 82;
+  --surface: 99% 0.004 85;
+  --surface-2: 95.5% 0.008 80;
+  --text: 22% 0.02 55;
+  --text-muted: 47% 0.02 58;
+  --border: 88% 0.012 75;
+  --primary: 60% 0.17 52;
+  --on-primary: 98% 0.01 85;
+  --secondary: 52% 0.13 250;
+  --accent: 66% 0.13 165;
+  --success: 56% 0.13 150;
+  --warning: 70% 0.15 75;
+  --error: 57% 0.19 25;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
-  --bg: 14 11 22;
-  --bg-elevated: 26 21 37;
-  --surface: 30 26 46;
-  --surface-2: 38 32 56;
-  --text: 245 240 255;
-  --text-muted: 168 160 184;
-  --border: 245 240 255;
-  --primary: 0 229 255;
-  --secondary: 139 92 246;
-  --accent: 251 191 36;
-  --success: 16 185 129;
-  --warning: 245 158 11;
-  --error: 239 68 68;
+  --bg: 17% 0.012 60;
+  --bg-elevated: 21% 0.014 60;
+  --surface: 23% 0.014 60;
+  --surface-2: 27% 0.016 60;
+  --text: 93% 0.012 85;
+  --text-muted: 70% 0.02 70;
+  --border: 33% 0.014 60;
+  --primary: 76% 0.15 68;
+  --on-primary: 18% 0.03 60;
+  --secondary: 74% 0.1 240;
+  --accent: 76% 0.12 165;
+  --success: 72% 0.13 150;
+  --warning: 80% 0.13 78;
+  --error: 70% 0.16 25;
 }
 
 @layer base {
@@ -44,13 +51,24 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    background-color: rgb(var(--bg));
-    color: rgb(var(--text));
+    background-color: oklch(var(--bg));
+    color: oklch(var(--text));
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
   }
   ::selection {
-    background-color: rgb(var(--primary) / 0.25);
+    background-color: oklch(var(--primary) / 0.22);
+  }
+  :focus-visible {
+    outline: none;
   }
 }
 
@@ -65,59 +83,94 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
 }
 
 @layer utilities {
-  /* Subtle grain overlay applied to <body class="grain"> */
-  .grain::before {
+  /* Blueprint grid + grain, applied on <body class="paper">. */
+  .paper::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    background-image:
+      linear-gradient(oklch(var(--text) / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(var(--text) / 0.03) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 78%);
   }
 }
 
-@keyframes trace-pulse {
-  0% {
-    stroke-dashoffset: 240;
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 0.9;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 0.15;
-  }
+/* Scroll reveal, driven by components/motion/reveal.tsx */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--ease-out-expo),
+    transform 0.7s var(--ease-out-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
-.trace-animate {
-  stroke-dasharray: 240;
-  animation: trace-pulse 7s ease-in-out infinite;
+[data-reveal="true"] {
+  opacity: 1;
+  transform: none;
 }
 
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Hero waveform: draw the trace, then loop a soft pulse of brightness. */
+@keyframes trace-draw {
+  0% { stroke-dashoffset: 1000; opacity: 0.2; }
+  35% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.9; }
 }
-.fade-up {
-  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+.trace-draw {
+  stroke-dasharray: 1000;
+  animation: trace-draw 3.2s var(--ease-out-expo) forwards;
+}
+.trace-draw--slow {
+  animation-duration: 4.4s;
+  animation-delay: 0.4s;
+}
+
+/* Pulse dot travels along the waveform via offset-path (no layout cost). */
+@keyframes pulse-travel {
+  from { offset-distance: 0%; }
+  to { offset-distance: 100%; }
+}
+.pulse-dot {
+  offset-path: path("M0 90 C 40 90, 55 30, 90 30 S 150 150, 190 90 S 260 20, 300 90 S 360 150, 400 90");
+  animation: pulse-travel 4.5s linear infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+.blink {
+  animation: blink 1.8s steps(1, end) infinite;
+}
+
+/* Credibility marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 26s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
 }
 
 @media print {
-  .no-print {
-    display: none !important;
-  }
-  body {
-    background: #fff;
-    color: #000;
-  }
+  .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+  .paper::before { display: none; }
 }
