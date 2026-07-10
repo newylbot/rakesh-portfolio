@@ -1,71 +1,79 @@
 "use client";
 
 import * as React from "react";
+import { useReducedMotion } from "framer-motion";
 
-const roles = [
-  "an Electrical Engineering graduate",
-  "an Industrial Automation practitioner",
-  "a Quality Control engineer",
-  "a SCADA and HMI designer",
-  "a Software and Simulation builder",
+const identitySequence = [
+  { text: "Rakesh", highlighted: true, hold: 2000 },
+  { text: "Electrical Engineer", highlighted: false, hold: 1150 },
+  { text: "Automation Builder", highlighted: false, hold: 1150 },
+  { text: "Quality Engineer", highlighted: false, hold: 1150 },
+  { text: "SCADA Designer", highlighted: false, hold: 1150 },
+  { text: "Software Builder", highlighted: false, hold: 1150 },
 ];
 
-/** Full-role typing loop: type, pause, erase, advance, repeat forever. */
+/**
+ * One stable, single-line identity loop:
+ * "I am Rakesh" first, held for two seconds, then concise resume-based roles.
+ * Every value types forward, pauses, deletes fully, and advances forever.
+ */
 export function RoleTypewriter({ className = "" }: { className?: string }) {
-  const [roleIndex, setRoleIndex] = React.useState(0);
+  const reduce = useReducedMotion();
+  const [itemIndex, setItemIndex] = React.useState(0);
   const [length, setLength] = React.useState(0);
   const [phase, setPhase] = React.useState<"typing" | "hold" | "deleting">("typing");
+  const item = identitySequence[itemIndex];
 
   React.useEffect(() => {
-    const role = roles[roleIndex];
-    const delay = phase === "hold" ? 1250 : phase === "deleting" ? 30 : 55;
+    if (reduce) { setLength(identitySequence[0].text.length); return; }
+    const delay = phase === "hold" ? item.hold : phase === "deleting" ? 34 : 64;
     const timer = window.setTimeout(() => {
       if (phase === "typing") {
-        if (length < role.length) setLength((value) => value + 1);
+        if (length < item.text.length) setLength((value) => value + 1);
         else setPhase("hold");
       } else if (phase === "hold") {
         setPhase("deleting");
       } else if (length > 0) {
         setLength((value) => value - 1);
       } else {
-        setRoleIndex((value) => (value + 1) % roles.length);
+        setItemIndex((value) => (value + 1) % identitySequence.length);
         setPhase("typing");
       }
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [length, phase, roleIndex]);
+  }, [length, phase, itemIndex, item.hold, item.text.length, reduce]);
 
   return (
-    <span className={`block min-h-[2rem] ${className}`} aria-live="polite">
-      <span className="font-semibold text-text">Rakesh Kumar Behera</span>
-      <span className="mx-2 text-text-muted" aria-hidden="true">-</span>
-      <span>I am {roles[roleIndex].slice(0, length)}</span>
+    <span className={`${className} block min-w-0`} aria-live="polite" aria-label={`I am ${item.text}`}>
+      <span aria-hidden="true" className="whitespace-nowrap">I am {" "}
+        <strong className={item.highlighted ? "font-extrabold text-primary" : "font-semibold text-secondary"}>
+          {item.text.slice(0, length)}
+        </strong>
+      </span>
       <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
     </span>
   );
 }
 
-/** One-shot name typing with the approved RAKESH / KUMAR BEHERA layout. */
+/** Types the resume name once, preserves the previous two-line layout, then blinks forever. */
 export function ResumeNameTypewriter() {
-  const full = "RAKESH\nKUMAR BEHERA";
-  const [length, setLength] = React.useState(0);
+  const reduce = useReducedMotion();
+  const text = "RAKESH\nKUMAR BEHERA";
+  const [length, setLength] = React.useState(reduce ? text.length : 0);
 
   React.useEffect(() => {
-    if (length >= full.length) return;
-    const timer = window.setTimeout(() => setLength((value) => value + 1), 68);
+    if (reduce || length >= text.length) return;
+    const timer = window.setTimeout(() => setLength((value) => value + 1), 72);
     return () => window.clearTimeout(timer);
-  }, [length, full.length]);
+  }, [length, reduce, text.length]);
 
-  const shown = full.slice(0, length);
-  const newline = shown.indexOf("\n");
-  const first = newline >= 0 ? shown.slice(0, newline) : shown;
-  const second = newline >= 0 ? shown.slice(newline + 1) : "";
-
+  const shown = text.slice(0, length);
+  const [first = "", second = ""] = shown.split("\n");
   return (
-    <h1 className="min-h-[1.72em] font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
+    <h1 className="font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
       <span aria-hidden="true">{first}</span>
-      {newline >= 0 ? <><br /><span aria-hidden="true">{second}</span></> : null}
-      {length < full.length ? <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" /> : null}
+      {shown.includes("\n") ? <><br /><span aria-hidden="true">{second}</span></> : null}
+      <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" />
     </h1>
   );
 }
