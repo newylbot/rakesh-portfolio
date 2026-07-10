@@ -1,60 +1,48 @@
-import type { Metadata } from "next";
-import { Section, SectionHeader } from "@/components/layout/section";
-import { Card } from "@/components/ui/card";
-import { ContactForm } from "@/components/forms/contact-form";
+import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/content/site-config";
-import { pageMetadata } from "@/lib/seo";
-import { isReal } from "@/lib/utils";
+import { Section, SectionHeader } from "@/components/layout/section";
+import { ContactForm } from "@/components/forms/contact-form";
 
-export const metadata: Metadata = pageMetadata(
-  "Contact",
-  "Get in touch about graduate electrical engineering, automation, quality, and junior backend roles.",
-  "/contact"
-);
+export const metadata = createMetadata({
+  title: "Contact",
+  description: "Get in touch with Rakesh Kumar Behera about dependable, systems-oriented work.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
-  const { contact, person } = siteConfig;
-  const endpointConfigured = Boolean(process.env.CONTACT_FORM_ENDPOINT);
-
+  const p = siteConfig.person;
+  const directLinks = [
+    { label: "Email", value: p.email, href: p.email ? `mailto:${p.email}` : "" },
+    { label: "GitHub", value: p.github, href: p.github },
+    { label: "LinkedIn", value: p.linkedin, href: p.linkedin },
+  ];
   return (
-    <Section ariaLabel="Contact">
-      <SectionHeader eyebrow="Contact" title={contact.headline} description={contact.body} />
-
-      <div className="grid gap-10 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ContactForm endpointConfigured={endpointConfigured} />
+    <Section>
+      <SectionHeader
+        eyebrow="Contact"
+        title="Let us build something dependable"
+        description="Recruiters, engineering teams, and collaborators are all welcome. I usually reply within a few days."
+      />
+      <div className="grid gap-10 lg:grid-cols-[1fr_18rem]">
+        <div>
+          <ContactForm />
         </div>
-        <aside className="space-y-4">
-          <Card>
-            <p className="readout">Direct</p>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>
-                Email:{" "}
-                {isReal(person.email) ? (
-                  <a href={`mailto:${person.email}`} className="text-primary">{person.email}</a>
+        <aside>
+          <h2 className="font-mono text-xs uppercase tracking-wider text-primary">Direct</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {directLinks.map((l) => (
+              <li key={l.label}>
+                {l.href ? (
+                  <a href={l.href} className="text-text-muted transition hover:text-primary" target={l.href.startsWith("http") ? "_blank" : undefined} rel={l.href.startsWith("http") ? "noopener noreferrer" : undefined}>
+                    {l.label}: {l.value}
+                  </a>
                 ) : (
-                  <span className="text-text-muted">not added yet</span>
+                  <span className="text-text-muted">{l.label}: <span className="font-mono text-xs">add link</span></span>
                 )}
               </li>
-              <li>
-                GitHub:{" "}
-                {isReal(person.github) ? (
-                  <a href={person.github} target="_blank" rel="noopener noreferrer" className="text-primary">profile</a>
-                ) : (
-                  <span className="text-text-muted">not added yet</span>
-                )}
-              </li>
-              <li>
-                LinkedIn:{" "}
-                {isReal(person.linkedin) ? (
-                  <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="text-primary">profile</a>
-                ) : (
-                  <span className="text-text-muted">not added yet</span>
-                )}
-              </li>
-              <li className="text-text-muted">Location: {person.location}</li>
-            </ul>
-          </Card>
+            ))}
+          </ul>
+          <p className="mt-6 text-xs text-text-muted">{siteConfig.person.availabilityLine}</p>
         </aside>
       </div>
     </Section>

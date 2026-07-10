@@ -1,45 +1,37 @@
-import type { Metadata } from "next";
-import { Section, SectionHeader } from "@/components/layout/section";
-import { Card } from "@/components/ui/card";
+import { createMetadata } from "@/lib/seo";
 import { siteConfig } from "@/content/site-config";
-import { pageMetadata } from "@/lib/seo";
+import { Section, SectionHeader } from "@/components/layout/section";
+import { SkillCard } from "@/components/cards/skill-card";
+import { Tag } from "@/components/ui/tag";
+import { CtaBand } from "@/components/sections/cta-band";
 
-export const metadata: Metadata = pageMetadata(
-  "Skills",
-  "Honest, context-labeled skills across electrical & industrial, software & systems, and tools & workflow.",
-  "/skills"
-);
+export const metadata = createMetadata({
+  title: "Skills",
+  description: "Skills across electrical & industrial, software & systems, and tools \u2014 with honest context labels.",
+  path: "/skills",
+});
+
+const legend = ["Hands-on", "Industrial exposure", "Working knowledge", "Learning", "Familiar with"];
 
 export default function SkillsPage() {
   const { skills } = siteConfig;
-  const groups = [
-    { label: "Electrical & Industrial", items: skills.electricalIndustrial },
-    { label: "Software & Systems", items: skills.softwareSystems },
-    { label: "Tools & Workflow", items: skills.toolsWorkflow },
-  ];
-
   return (
-    <Section ariaLabel="Skills">
-      <SectionHeader
-        eyebrow="Skills"
-        title="Skills, framed honestly"
-        description="Context labels like Hands-on, Industrial exposure, Working knowledge, and Learning — no invented proficiency bars."
-      />
-      <div className="grid gap-6 md:grid-cols-3">
-        {groups.map((g) => (
-          <Card key={g.label}>
-            <h2 className="text-h3 font-semibold">{g.label}</h2>
-            <ul className="mt-4 space-y-3">
-              {g.items.map((s) => (
-                <li key={s.name} className="flex items-start justify-between gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
-                  <span className="text-sm">{s.name}</span>
-                  <span className="shrink-0 rounded-sm border border-border px-2 py-0.5 font-mono text-xs text-text-muted">{s.level}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ))}
-      </div>
-    </Section>
+    <>
+      <Section>
+        <SectionHeader eyebrow="Skills" title="Framed honestly" description={skills.intro} />
+        <div className="mb-8 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-xs uppercase tracking-wider text-text-muted">Context labels:</span>
+          {legend.map((l) => (
+            <Tag key={l}>{l}</Tag>
+          ))}
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <SkillCard title="Electrical & Industrial" skills={skills.electricalIndustrial} />
+          <SkillCard title="Software & Systems" skills={skills.softwareSystems} />
+          <SkillCard title="Tools & Workflow" skills={skills.toolsWorkflow} />
+        </div>
+      </Section>
+      <CtaBand />
+    </>
   );
 }
