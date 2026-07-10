@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 
-const roleLines = [
+const roles = [
   "an Electrical Engineering graduate",
   "an Industrial Automation practitioner",
   "a Quality Control engineer",
@@ -11,52 +11,60 @@ const roleLines = [
   "a Software and Simulation builder",
 ];
 
-function useTypewriter(lines: string[], enabled = true) {
-  const [line, setLine] = React.useState(0);
-  const [count, setCount] = React.useState(0);
-  const [deleting, setDeleting] = React.useState(false);
+/** Types a full role, pauses, deletes it fully, then loops forever. */
+export function RoleTypewriter({ className = "" }: { className?: string }) {
+  const reduce = useReducedMotion();
+  const [roleIndex, setRoleIndex] = React.useState(0);
+  const [length, setLength] = React.useState(0);
+  const [phase, setPhase] = React.useState<"typing" | "hold" | "deleting">("typing");
 
   React.useEffect(() => {
-    if (!enabled) { setCount(lines[0].length); return; }
-    const text = lines[line];
-    const complete = count === text.length;
-    const empty = count === 0;
-    const delay = complete && !deleting ? 1350 : empty && deleting ? 220 : deleting ? 34 : 58;
+    if (reduce) { setLength(roles[0].length); return; }
+    const role = roles[roleIndex];
+    const delay = phase === "hold" ? 1350 : phase === "deleting" ? 32 : 58;
     const timer = window.setTimeout(() => {
-      if (complete && !deleting) setDeleting(true);
-      else if (empty && deleting) { setDeleting(false); setLine((line + 1) % lines.length); }
-      else setCount((value) => Math.max(0, Math.min(text.length, value + (deleting ? -1 : 1))));
+      if (phase === "typing") {
+        if (length < role.length) setLength((value) => value + 1);
+        else setPhase("hold");
+      } else if (phase === "hold") {
+        setPhase("deleting");
+      } else if (length > 0) {
+        setLength((value) => value - 1);
+      } else {
+        setRoleIndex((value) => (value + 1) % roles.length);
+        setPhase("typing");
+      }
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [count, deleting, line, lines, enabled]);
-
-  return enabled ? lines[line].slice(0, count) : lines[0];
-}
-
-export function TypewriterIdentity({ large = false }: { large?: boolean }) {
-  const reduce = useReducedMotion();
-  const [nameCount, setNameCount] = React.useState(reduce ? "Rakesh Kumar Behera".length : 0);
-  const name = "Rakesh Kumar Behera";
-
-  React.useEffect(() => {
-    if (reduce || nameCount >= name.length) return;
-    const timer = window.setTimeout(() => setNameCount((value) => value + 1), 72);
-    return () => window.clearTimeout(timer);
-  }, [nameCount, reduce]);
-
-  const role = useTypewriter(roleLines, !reduce && nameCount >= name.length);
+  }, [length, phase, roleIndex, reduce]);
 
   return (
-    <div className={large ? "min-h-[9rem]" : "min-h-[3.25rem]"}>
-      <p className={large ? "font-display text-[clamp(3rem,8vw,7rem)] font-extrabold leading-[.88] tracking-[-.055em] text-text" : "font-display text-lg font-bold tracking-[-.02em] text-text sm:text-xl"}>
-        {name.slice(0, nameCount)}
-        {nameCount < name.length ? <span aria-hidden="true" className="ml-1 inline-block h-[.85em] w-[3px] animate-pulse bg-primary" /> : null}
-      </p>
-      {nameCount >= name.length ? (
-        <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className={large ? "mt-5 font-mono text-sm uppercase tracking-[.13em] text-text-muted sm:text-base" : "mt-1 font-mono text-[.62rem] uppercase tracking-[.11em] text-text-muted sm:text-xs"}>
-          I am {role}<span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
-        </motion.p>
-      ) : null}
-    </div>
+    <span className={className} aria-label={`I am ${roles[roleIndex]}`}>
+      <span aria-hidden="true">I am {roles[roleIndex].slice(0, length)}</span>
+      <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
+    </span>
+  );
+}
+
+/** Types the resume name once and keeps the exact two-line editorial layout. */
+export function ResumeNameTypewriter() {
+  const reduce = useReducedMotion();
+  const text = "RAKESH\nKUMAR BEHERA";
+  const [length, setLength] = React.useState(reduce ? text.length : 0);
+
+  React.useEffect(() => {
+    if (reduce || length >= text.length) return;
+    const timer = window.setTimeout(() => setLength((value) => value + 1), 72);
+    return () => window.clearTimeout(timer);
+  }, [length, reduce, text.length]);
+
+  const shown = text.slice(0, length);
+  const [first = "", second = ""] = shown.split("\n");
+  return (
+    <h1 className="font-display text-[clamp(3.4rem,8vw,7rem)] font-extrabold leading-[.84] tracking-[-.055em] text-text" aria-label="Rakesh Kumar Behera">
+      <span aria-hidden="true">{first}</span>
+      {shown.includes("\n") ? <><br /><span aria-hidden="true">{second}</span></> : null}
+      {length < text.length ? <span aria-hidden="true" className="ml-1 inline-block h-[.78em] w-[3px] animate-pulse bg-primary" /> : null}
+    </h1>
   );
 }
