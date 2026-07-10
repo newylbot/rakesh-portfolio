@@ -1,26 +1,27 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export function Card({
-  children,
-  className,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
-  className?: string;
-  as?: "div" | "article" | "li";
-}) {
+export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Tag
+    <div
       className={cn(
-        "relative rounded-md border border-border bg-surface p-6 shadow-soft",
-        // terminal-block corner pins
-        "before:absolute before:left-3 before:top-3 before:h-1.5 before:w-1.5 before:rounded-full before:bg-border before:content-['']",
-        "after:absolute after:right-3 after:top-3 after:h-1.5 after:w-1.5 after:rounded-full after:bg-border after:content-['']",
+        "relative rounded-lg border border-border bg-surface p-6 transition-all duration-200",
         className
       )}
     >
       {children}
-    </Tag>
+    </div>
+  );
+}
+
+// Terminal-block style corner pins, used to give cards an instrumentation feel.
+export function ConnectorPins() {
+  return (
+    <span aria-hidden className="pointer-events-none absolute inset-0">
+      <span className="absolute left-2 top-2 h-1.5 w-1.5 rounded-full border border-border" />
+      <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full border border-border" />
+      <span className="absolute bottom-2 left-2 h-1.5 w-1.5 rounded-full border border-border" />
+      <span className="absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full border border-border" />
+    </span>
   );
 }

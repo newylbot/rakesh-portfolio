@@ -1,24 +1,16 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Tone = "neutral" | "progress" | "planned" | "live";
+type Tone = "progress" | "planned" | "done" | "neutral";
 
 const tones: Record<Tone, string> = {
-  neutral: "border-border text-text-muted",
-  progress: "border-warning/40 text-warning",
-  planned: "border-border text-text-muted",
-  live: "border-success/40 text-success",
+  progress: "text-accent border-accent/40 bg-accent/10",
+  planned: "text-text-muted border-border bg-surface-2",
+  done: "text-success border-success/40 bg-success/10",
+  neutral: "text-text-muted border-border bg-surface",
 };
 
-export function Badge({
-  children,
-  tone = "neutral",
-  className,
-}: {
-  children: ReactNode;
-  tone?: Tone;
-  className?: string;
-}) {
+export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: Tone; className?: string }) {
   return (
     <span
       className={cn(
@@ -27,9 +19,14 @@ export function Badge({
         className
       )}
     >
-      {/* status dot doubles as a non-color cue via the label text */}
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+      <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
       {children}
     </span>
   );
+}
+
+export function statusTone(status: string): Tone {
+  if (status === "In progress") return "progress";
+  if (status === "Completed") return "done";
+  return "planned";
 }

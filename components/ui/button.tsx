@@ -1,66 +1,52 @@
 import Link from "next/link";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "outline";
+type Variant = "primary" | "secondary" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-md px-5 min-h-[48px] text-sm font-medium transition-all duration-200 focus-visible:outline-2 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-md px-5 min-h-[48px] text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary text-bg hover:brightness-110 hover:shadow-glow",
+    "bg-primary text-bg font-semibold hover:brightness-110 hover:scale-[1.02] shadow-sm",
   secondary:
-    "bg-secondary text-bg hover:brightness-110",
-  outline:
-    "border border-border bg-transparent text-text hover:bg-surface-2",
-  ghost: "bg-transparent text-text-muted hover:text-text hover:bg-surface-2",
+    "border border-border bg-surface text-text hover:border-primary hover:text-primary",
+  ghost: "text-text-muted hover:text-text hover:bg-surface-2",
 };
 
-type CommonProps = {
+interface CommonProps {
   variant?: Variant;
   className?: string;
   children: ReactNode;
-};
+}
 
-type AsLink = CommonProps & {
-  href: string;
-  external?: boolean;
-};
-
-type AsButton = CommonProps &
-  ButtonHTMLAttributes<HTMLButtonElement> & { href?: undefined };
-
-export function Button(props: AsLink | AsButton) {
-  const { variant = "primary", className, children } = props;
-  const classes = cn(base, variants[variant], className);
-
-  if ("href" in props && props.href) {
-    const external = "external" in props && props.external;
-    if (external) {
-      return (
-        <a
-          href={props.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={classes}
-        >
-          {children}
-        </a>
-      );
-    }
-    return (
-      <Link href={props.href} className={classes}>
-        {children}
-      </Link>
-    );
-  }
-
-  const { variant: _v, className: _c, children: _ch, href: _h, ...rest } =
-    props as AsButton;
+export function Button({ variant = "primary", className, children, ...props }: CommonProps & ComponentProps<"button">) {
   return (
-    <button className={classes} {...rest}>
+    <button className={cn(base, variants[variant], className)} {...props}>
       {children}
     </button>
+  );
+}
+
+export function ButtonLink({
+  href,
+  variant = "primary",
+  className,
+  children,
+  external,
+  ...props
+}: CommonProps & { href: string; external?: boolean } & Omit<ComponentProps<typeof Link>, "href">) {
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cn(base, variants[variant], className)}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={cn(base, variants[variant], className)} {...props}>
+      {children}
+    </Link>
   );
 }
