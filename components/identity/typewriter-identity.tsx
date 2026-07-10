@@ -9,51 +9,42 @@ const sequence = [
   { text: "Quality Engineer", strong: false, hold: 1100 },
   { text: "SCADA Designer", strong: false, hold: 1100 },
   { text: "Software Builder", strong: false, hold: 1100 },
-] as const;
+];
 
-const wait = (duration: number) => new Promise<void>((resolve) => window.setTimeout(resolve, duration));
+type Phase = "typing" | "holding" | "deleting" | "gap";
 
 export function RoleTypewriter({ className = "" }: { className?: string }) {
   const [index, setIndex] = React.useState(0);
-  const [text, setText] = React.useState("");
+  const [visible, setVisible] = React.useState(0);
+  const [phase, setPhase] = React.useState<Phase>("typing");
+  const current = sequence[index];
 
   React.useEffect(() => {
-    let active = true;
-
-    async function run() {
-      let nextIndex = 0;
-      while (active) {
-        const item = sequence[nextIndex];
-        setIndex(nextIndex);
-
-        for (let length = 1; active && length <= item.text.length; length += 1) {
-          setText(item.text.slice(0, length));
-          await wait(60);
-        }
-        if (!active) return;
-        await wait(item.hold);
-
-        for (let length = item.text.length - 1; active && length >= 0; length -= 1) {
-          setText(item.text.slice(0, length));
-          await wait(32);
-        }
-        if (!active) return;
-        await wait(180);
-        nextIndex = (nextIndex + 1) % sequence.length;
+    const delay = phase === "holding" ? current.hold : phase === "deleting" ? 32 : phase === "gap" ? 180 : 60;
+    const timer = window.setTimeout(() => {
+      if (phase === "typing") {
+        if (visible < current.text.length) setVisible((value) => value + 1);
+        else setPhase("holding");
+      } else if (phase === "holding") {
+        setPhase("deleting");
+      } else if (phase === "deleting") {
+        if (visible > 0) setVisible((value) => value - 1);
+        else setPhase("gap");
+      } else {
+        setIndex((value) => (value + 1) % sequence.length);
+        setVisible(0);
+        setPhase("typing");
       }
-    }
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [current.hold, current.text.length, phase, visible]);
 
-    void run();
-    return () => { active = false; };
-  }, []);
-
-  const current = sequence[index];
   return (
-    <span className={`${className} block min-w-0`} aria-label={`I am ${current.text}`}>
-      <span aria-hidden="true" className="whitespace-nowrap">
+    <span className={`${className} block min-w-0`} aria-live="polite" aria-atomic="true">
+      <span className="whitespace-nowrap">
         I am{" "}
         <strong className={current.strong ? "font-extrabold text-primary" : "font-semibold text-secondary"}>
-          {text}
+          {current.text.substring(0, visible)}
         </strong>
       </span>
       <span aria-hidden="true" className="ml-1 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-primary" />
@@ -62,28 +53,16 @@ export function RoleTypewriter({ className = "" }: { className?: string }) {
 }
 
 export function ResumeNameTypewriter() {
-  const fullText = "RAKESH\nKUMAR BEHERA";
+  const text = "RAKESH\nKUMAR BEHERA";
   const [visible, setVisible] = React.useState(0);
 
   React.useEffect(() => {
-    let active = true;
-    let length = 0;
+    if (visible >= text.length) return;
+    const timer = window.setTimeout(() => setVisible((value) => value + 1), 72);
+    return () => window.clearTimeout(timer);
+  }, [text.length, visible]);
 
-    const typeNext = () => {
-      if (!active || length >= fullText.length) return;
-      length += 1;
-      setVisible(length);
-      window.setTimeout(typeNext, 72);
-    };
-
-    const start = window.setTimeout(typeNext, 220);
-    return () => {
-      active = false;
-      window.clearTimeout(start);
-    };
-  }, [fullText.length]);
-
-  const shown = fullText.slice(0, visible);
+  const shown = text.substring(0, visible);
   const [first = "", second = ""] = shown.split("\n");
 
   return (
