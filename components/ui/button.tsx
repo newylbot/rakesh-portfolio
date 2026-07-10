@@ -1,52 +1,75 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
-import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost";
-
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-md px-5 min-h-[48px] text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none";
 
-const variants: Record<Variant, string> = {
-  primary:
-    "bg-primary text-bg font-semibold hover:brightness-110 hover:scale-[1.02] shadow-sm",
-  secondary:
-    "border border-border bg-surface text-text hover:border-primary hover:text-primary",
+const variants = {
+  primary: "bg-primary text-bg hover:shadow-[0_0_22px_-6px_rgb(var(--primary)/0.8)] hover:-translate-y-0.5",
+  secondary: "bg-surface-2 text-text border border-border hover:border-primary",
+  outline: "border border-border text-text hover:border-primary hover:text-primary",
   ghost: "text-text-muted hover:text-text hover:bg-surface-2",
 };
 
-interface CommonProps {
-  variant?: Variant;
+const sizes = {
+  sm: "h-9 px-3 text-meta",
+  md: "h-11 px-5 text-sm",
+  lg: "h-12 px-7 text-base",
+};
+
+export interface ButtonProps {
+  variant?: keyof typeof variants;
+  size?: keyof typeof sizes;
+  href?: string;
   className?: string;
   children: ReactNode;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  target?: string;
+  rel?: string;
+  ariaLabel?: string;
 }
 
-export function Button({ variant = "primary", className, children, ...props }: CommonProps & ComponentProps<"button">) {
-  return (
-    <button className={cn(base, variants[variant], className)} {...props}>
-      {children}
-    </button>
-  );
-}
-
-export function ButtonLink({
-  href,
+export function Button({
   variant = "primary",
+  size = "md",
+  href,
   className,
   children,
-  external,
-  ...props
-}: CommonProps & { href: string; external?: boolean } & Omit<ComponentProps<typeof Link>, "href">) {
-  if (external) {
+  type = "button",
+  disabled,
+  target,
+  rel,
+  ariaLabel,
+}: ButtonProps) {
+  const classes = cn(base, variants[variant], sizes[size], className);
+
+  if (href) {
+    const external = href.startsWith("http") || href.startsWith("mailto:");
+    if (external) {
+      return (
+        <a
+          href={href}
+          target={target}
+          rel={rel ?? (target === "_blank" ? "noopener noreferrer" : undefined)}
+          className={classes}
+          aria-label={ariaLabel}
+        >
+          {children}
+        </a>
+      );
+    }
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={cn(base, variants[variant], className)}>
+      <Link href={href} className={classes} aria-label={ariaLabel}>
         {children}
-      </a>
+      </Link>
     );
   }
+
   return (
-    <Link href={href} className={cn(base, variants[variant], className)} {...props}>
+    <button type={type} disabled={disabled} className={classes} aria-label={ariaLabel}>
       {children}
-    </Link>
+    </button>
   );
 }

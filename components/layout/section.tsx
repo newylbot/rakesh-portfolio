@@ -1,18 +1,10 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export function Section({
-  children,
-  className,
-  id,
-}: {
-  children: ReactNode;
-  className?: string;
-  id?: string;
-}) {
+export function Section({ id, children, className }: { id?: string; children: ReactNode; className?: string }) {
   return (
-    <section id={id} className={cn("py-16 sm:py-20 lg:py-24", className)}>
-      <div className="container-content">{children}</div>
+    <section id={id} className={cn("mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-24", className)}>
+      {children}
     </section>
   );
 }
@@ -20,21 +12,19 @@ export function Section({
 export function SectionHeader({
   eyebrow,
   title,
-  intro,
-  className,
+  description,
 }: {
   eyebrow?: string;
   title: string;
-  intro?: string;
-  className?: string;
+  description?: string;
 }) {
   return (
-    <div className={cn("mb-10 max-w-2xl", className)}>
-      {eyebrow && (
+    <div className="mb-10 max-w-2xl">
+      {eyebrow ? (
         <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
-      )}
-      <h2 className="text-h2 font-display font-semibold text-text">{title}</h2>
-      {intro && <p className="mt-4 text-body-lg text-text-muted">{intro}</p>}
+      ) : null}
+      <h2 className="text-h2 font-semibold text-text">{title}</h2>
+      {description ? <p className="mt-3 text-body-lg text-text-muted">{description}</p> : null}
     </div>
   );
 }

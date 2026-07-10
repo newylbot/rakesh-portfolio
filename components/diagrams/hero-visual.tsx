@@ -1,61 +1,70 @@
-// Decorative, lightweight SVG: signal waveform + circuit traces + nodes.
-// Hidden from assistive tech. Pulse degrades under prefers-reduced-motion.
+/**
+ * Decorative hero visual: signal waveform + circuit traces + nodes.
+ * Purely decorative — hidden from assistive tech. Motion degrades under
+ * prefers-reduced-motion (see .trace-animate in globals.css).
+ */
 export function HeroVisual() {
   return (
-    <div aria-hidden className="relative w-full">
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-surface">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-10 opacity-60 blur-2xl"
+        style={{
+          background:
+            "radial-gradient(40% 40% at 70% 30%, rgb(var(--primary) / 0.25), transparent), radial-gradient(40% 40% at 25% 75%, rgb(var(--secondary) / 0.20), transparent)",
+        }}
+      />
       <svg
-        viewBox="0 0 480 360"
+        viewBox="0 0 400 300"
+        className="absolute inset-0 h-full w-full"
         role="presentation"
-        className="h-auto w-full"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="xMidYMid slice"
       >
         <defs>
-          <linearGradient id="trace" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="var(--primary)" />
-            <stop offset="100%" stopColor="var(--secondary)" />
+          <linearGradient id="trace" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="rgb(var(--primary))" stopOpacity="0" />
+            <stop offset="50%" stopColor="rgb(var(--primary))" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="rgb(var(--secondary))" stopOpacity="0" />
           </linearGradient>
         </defs>
-
-        {/* panel frame */}
-        <rect x="1" y="1" width="478" height="358" rx="16" stroke="var(--border)" />
-
-        {/* faint grid */}
-        {Array.from({ length: 11 }).map((_, i) => (
-          <line key={`v${i}`} x1={40 * i} y1="0" x2={40 * i} y2="360" stroke="var(--border)" strokeOpacity="0.35" />
-        ))}
-        {Array.from({ length: 9 }).map((_, i) => (
-          <line key={`h${i}`} x1="0" y1={40 * i} x2="480" y2={40 * i} stroke="var(--border)" strokeOpacity="0.35" />
-        ))}
-
-        {/* oscilloscope waveform */}
+        <g stroke="rgb(var(--border) / 0.5)" strokeWidth="1">
+          {[60, 120, 180, 240].map((y) => (
+            <line key={y} x1="0" y1={y} x2="400" y2={y} />
+          ))}
+          {[80, 160, 240, 320].map((x) => (
+            <line key={x} x1={x} y1="0" x2={x} y2="300" />
+          ))}
+        </g>
         <path
-          d="M20 200 H120 L140 120 L160 280 L180 160 L200 200 H300 L320 150 L340 250 L360 200 H460"
+          d="M0 200 L60 200 L80 200 L100 140 L120 200 L160 200 L180 120 L200 200 L260 200 L280 90 L300 200 L360 200 L400 200"
+          fill="none"
           stroke="url(#trace)"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-          className="animate-pulse-trace"
+          strokeWidth="2"
+          className="trace-animate"
         />
-
-        {/* circuit traces */}
-        <path d="M40 320 H180 V260 H260" stroke="var(--primary)" strokeOpacity="0.5" strokeWidth="1.5" />
-        <path d="M440 40 H320 V90 H240" stroke="var(--secondary)" strokeOpacity="0.5" strokeWidth="1.5" />
-
-        {/* nodes */}
+        <path
+          d="M20 40 L120 40 L140 70 L260 70 L280 40 L380 40"
+          fill="none"
+          stroke="rgb(var(--primary) / 0.55)"
+          strokeWidth="1.5"
+        />
         {[
-          [180, 260],
-          [260, 260],
-          [320, 90],
-          [240, 90],
-          [40, 320],
+          [120, 40],
+          [140, 70],
+          [260, 70],
+          [280, 40],
+          [100, 140],
+          [180, 120],
+          [280, 90],
         ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="4" fill="var(--bg)" stroke="var(--primary)" strokeWidth="1.5" />
+          <circle key={i} cx={cx} cy={cy} r="3" fill="rgb(var(--primary))" />
         ))}
-
-        {/* mono labels */}
-        <text x="20" y="28" fill="var(--text-muted)" fontFamily="monospace" fontSize="11">CH1 · SIGNAL</text>
-        <text x="360" y="345" fill="var(--text-muted)" fontFamily="monospace" fontSize="11">50ms / DIV</text>
       </svg>
+      <div className="absolute bottom-3 left-3 font-mono text-[10px] uppercase tracking-widest text-text-muted">
+        signal / trace / node
+      </div>
     </div>
   );
 }

@@ -2,15 +2,13 @@ import { siteConfig } from "@/content/site-config";
 
 export function CredibilityStrip() {
   return (
-    <div className="border-y border-border bg-bg-elevated">
-      <div className="container-content flex flex-wrap items-center gap-x-6 gap-y-3 py-5">
-        {siteConfig.credibility.map((item, i) => (
-          <div key={item} className="flex items-center gap-6">
+    <div className="border-y border-border bg-surface/40">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 sm:px-8">
+        {siteConfig.home.credibility.map((item, i) => (
+          <span key={item} className="flex items-center gap-6">
+            {i > 0 ? <span aria-hidden="true" className="hidden h-3 w-px bg-border sm:block" /> : null}
             <span className="font-mono text-xs uppercase tracking-wider text-text-muted">{item}</span>
-            {i < siteConfig.credibility.length - 1 && (
-              <span aria-hidden className="hidden h-3 w-px bg-border sm:inline-block" />
-            )}
-          </div>
+          </span>
         ))}
       </div>
     </div>

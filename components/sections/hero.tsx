@@ -1,31 +1,24 @@
 import { siteConfig } from "@/content/site-config";
-import { ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HeroVisual } from "@/components/diagrams/hero-visual";
-import { ArrowRight, Download } from "lucide-react";
 
 export function Hero() {
-  const { person } = siteConfig;
+  const p = siteConfig.person;
   return (
-    <section className="relative overflow-hidden">
-      {/* soft aurora accent */}
-      <div aria-hidden className="pointer-events-none absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-      <div className="container-content grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-2 lg:py-28">
-        <div className="animate-fade-up">
-          <Badge tone="progress">{person.availabilityLabel}</Badge>
-          <h1 className="mt-5 text-display-lg font-display font-semibold text-text">{person.headline}</h1>
-          <p className="mt-5 max-w-xl text-body-lg text-text-muted">{person.supporting}</p>
+    <section className="mx-auto w-full max-w-6xl px-5 pb-8 pt-16 sm:px-8 sm:pt-24">
+      <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="fade-up">
+          <Badge tone="available">{p.availability}</Badge>
+          <h1 className="mt-6 text-display-lg font-semibold text-text">{p.headline}</h1>
+          <p className="mt-5 max-w-xl text-body-lg text-text-muted">{p.heroParagraph}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href="/projects" variant="primary">
-              Explore my work <ArrowRight className="h-4 w-4" />
-            </ButtonLink>
-            <ButtonLink href="/resume" variant="secondary">
-              <Download className="h-4 w-4" /> Download resume
-            </ButtonLink>
+            <Button href="/projects" size="lg">Explore my work</Button>
+            <Button href={p.resumeUrl || "/resume"} size="lg" variant="outline">Download resume</Button>
           </div>
-          <p className="mt-6 font-mono text-xs text-text-muted">{person.availabilityLine}</p>
+          <p className="mt-6 font-mono text-xs uppercase tracking-wider text-text-muted">{p.availabilityLine}</p>
         </div>
-        <div className="animate-fade-up lg:pl-6">
+        <div className="fade-up">
           <HeroVisual />
         </div>
       </div>

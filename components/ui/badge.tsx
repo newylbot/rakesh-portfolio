@@ -1,32 +1,33 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Tone = "progress" | "planned" | "done" | "neutral";
+type Tone = "progress" | "planned" | "available" | "neutral";
 
 const tones: Record<Tone, string> = {
-  progress: "text-accent border-accent/40 bg-accent/10",
-  planned: "text-text-muted border-border bg-surface-2",
-  done: "text-success border-success/40 bg-success/10",
-  neutral: "text-text-muted border-border bg-surface",
+  progress: "border-warning text-warning",
+  planned: "border-border text-text-muted",
+  available: "border-success text-success",
+  neutral: "border-border text-text-muted",
 };
 
-export function Badge({ children, tone = "neutral", className }: { children: ReactNode; tone?: Tone; className?: string }) {
+export function Badge({ tone = "neutral", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 font-mono text-xs uppercase tracking-wider",
+        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-xs uppercase tracking-wider",
         tones[tone],
-        className
+        className,
       )}
     >
-      <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
       {children}
     </span>
   );
 }
 
-export function statusTone(status: string): Tone {
-  if (status === "In progress") return "progress";
-  if (status === "Completed") return "done";
+export function toneForStatus(status: string): Tone {
+  const s = status.toLowerCase();
+  if (s.includes("progress")) return "progress";
+  if (s.includes("open") || s.includes("available")) return "available";
   return "planned";
 }

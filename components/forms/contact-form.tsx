@@ -1,52 +1,53 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import * as React from "react";
+import { siteConfig } from "@/content/site-config";
 import { Button } from "@/components/ui/button";
 
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "success" | "error" | "unconfigured";
 
-const endpoint = process.env.NEXT_PUBLIC_CONTACT_FORM_ENDPOINT || "";
+const inputClass =
+  "w-full rounded-md border border-border bg-bg px-3 py-2.5 text-sm text-text placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
 
 export function ContactForm() {
-  const [status, setStatus] = useState<Status>("idle");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [status, setStatus] = React.useState<Status>("idle");
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const email = siteConfig.person.email;
 
-  function validate(data: FormData) {
-    const next: Record<string, string> = {};
-    const name = String(data.get("name") || "").trim();
-    const email = String(data.get("email") || "").trim();
-    const message = String(data.get("message") || "").trim();
-    if (!name) next.name = "Please enter your name.";
-    if (!email) next.email = "Please enter your email.";
-    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) next.email = "Please enter a valid email address.";
-    if (message.length < 10) next.message = "Please add a little more detail (10+ characters).";
-    return next;
-  }
-
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
-    const found = validate(data);
-    setErrors(found);
-    if (Object.keys(found).length > 0) return;
 
-    // Honeypot spam protection: real users leave this empty.
-    if (String(data.get("company") || "")) return;
-
-    if (!endpoint) {
-      // No real backend connected yet — be honest, do not fake a send.
-      setStatus("error");
+    // Honeypot: real users never fill this.
+    if ((data.get("company") as string)?.length) {
+      setStatus("success");
+      form.reset();
       return;
     }
 
+    const next: Record<string, string> = {};
+    const name = (data.get("name") as string)?.trim();
+    const mail = (data.get("email") as string)?.trim();
+    const message = (data.get("message") as string)?.trim();
+    if (!name) next.name = "Please enter your name.";
+    if (!mail) next.email = "Please enter your email.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) next.email = "Please enter a valid email.";
+    if (!message) next.message = "Please enter a message.";
+    setErrors(next);
+    if (Object.keys(next).length) return;
+
+    setStatus("submitting");
     try {
-      setStatus("submitting");
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(Object.fromEntries(data.entries())),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email: mail, message }),
       });
+      if (res.status === 501) {
+        setStatus("unconfigured");
+        return;
+      }
       if (!res.ok) throw new Error("Request failed");
       setStatus("success");
       form.reset();
@@ -55,54 +56,67 @@ export function ContactForm() {
     }
   }
 
-  const inputClass =
-    "w-full rounded-md border border-border bg-surface px-4 py-3 text-text placeholder:text-text-muted/60 focus-visible:border-primary";
-
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-5">
-      {/* honeypot */}
-      <div className="hidden" aria-hidden>
-        <label>Company<input type="text" name="company" tabIndex={-1} autoComplete="off" /></label>
+      {/* Honeypot field — visually hidden, ignored by humans. */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="company">Company</label>
+        <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-text">Name</label>
-        <input id="name" name="name" type="text" autoComplete="name" className={inputClass}
-          aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-error" : undefined} />
-        {errors.name && <p id="name-error" className="mt-1.5 text-sm text-error">{errors.name}</p>}
+        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-text">
+          Name
+        </label>
+        <input id="name" name="name" type="text" autoComplete="name" className={inputClass} aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-error" : undefined} />
+        {errors.name ? (
+          <p id="name-error" className="mt-1.5 text-sm text-error">{errors.name}</p>
+        ) : null}
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text">Email</label>
-        <input id="email" name="email" type="email" autoComplete="email" className={inputClass}
-          aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} />
-        {errors.email && <p id="email-error" className="mt-1.5 text-sm text-error">{errors.email}</p>}
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text">
+          Email
+        </label>
+        <input id="email" name="email" type="email" autoComplete="email" className={inputClass} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} />
+        {errors.email ? (
+          <p id="email-error" className="mt-1.5 text-sm text-error">{errors.email}</p>
+        ) : null}
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-text">Message</label>
-        <textarea id="message" name="message" rows={5} className={inputClass}
-          aria-invalid={!!errors.message} aria-describedby={errors.message ? "message-error" : undefined} />
-        {errors.message && <p id="message-error" className="mt-1.5 text-sm text-error">{errors.message}</p>}
+        <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-text">
+          Message
+        </label>
+        <textarea id="message" name="message" rows={5} className={inputClass} aria-invalid={!!errors.message} aria-describedby={errors.message ? "message-error" : undefined} />
+        {errors.message ? (
+          <p id="message-error" className="mt-1.5 text-sm text-error">{errors.message}</p>
+        ) : null}
       </div>
 
-      <Button type="submit" disabled={status === "submitting"}>
-        {status === "submitting" ? "Sending…" : "Send message"}
-      </Button>
-
-      <div aria-live="polite" className="min-h-[1.5rem]">
-        {status === "success" && (
-          <p className="text-sm text-success">Thanks — your message was sent. I’ll get back to you soon.</p>
-        )}
-        {status === "error" && !endpoint && (
-          <p className="text-sm text-warning">
-            The contact form backend isn’t connected yet. Set NEXT_PUBLIC_CONTACT_FORM_ENDPOINT, or reach out directly once contact links are added.
-          </p>
-        )}
-        {status === "error" && endpoint && (
-          <p className="text-sm text-error">Something went wrong sending your message. Please try again.</p>
-        )}
+      <div className="flex items-center gap-4">
+        <Button type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? "Sending\u2026" : "Send message"}
+        </Button>
+        <span aria-live="polite" className="text-sm">
+          {status === "success" ? <span className="text-success">Thanks — your message was sent.</span> : null}
+          {status === "error" ? <span className="text-error">Something went wrong. Please try again.</span> : null}
+        </span>
       </div>
+
+      {status === "unconfigured" ? (
+        <p className="rounded-md border border-border bg-surface-2 p-3 text-sm text-text-muted">
+          Messaging isn{"\u2019"}t wired up yet.{" "}
+          {email ? (
+            <>
+              Please email me directly at{" "}
+              <a href={`mailto:${email}`} className="text-primary underline">{email}</a>.
+            </>
+          ) : (
+            <>Add a real email or CONTACT_FORM_ENDPOINT to enable this form.</>
+          )}
+        </p>
+      ) : null}
     </form>
   );
 }
