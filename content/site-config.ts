@@ -1,322 +1,64 @@
-/**
- * SINGLE SOURCE OF TRUTH FOR SITE CONTENT
- * ---------------------------------------
- * Edit this file to update the site. Components read from here so you should
- * (almost) never have to touch component code to change copy, links, or data.
- *
- * TRUTHFULNESS RULES:
- * - Leave links as empty strings ("") until they are real.
- * - Use the exact placeholder "[Confirm / add details]" for unknown facts.
- * - Do NOT convert placeholders into real claims until confirmed.
- * - Do NOT add metrics, users, uptime, certifications, or deployment claims
- *   unless verified.
- */
-
-export interface NavItem {
-  label: string;
-  href: string;
-}
-
-export interface SocialLink {
-  label: string;
-  href: string; // "" until real
-}
-
-export interface ExperienceItem {
-  company: string;
-  role: string;
-  period: string;
-  location: string;
-  type: string;
-  summary: string[];
-  systems: string[];
-  reflection: string;
-  evidenceUrl: string; // "" until real
-}
-
-export interface Project {
-  slug: string;
-  title: string;
-  category: string;
-  status: string; // e.g. "In progress" | "Planned"
-  oneLine: string;
-  stack: string[];
-  github: string; // "" until real
-  demo: string; // "" until real
-  placeholder?: boolean; // true = empty-state slot, do not present as a real build
-}
-
-export interface Skill {
-  name: string;
-  level: string;
-}
+export interface ExperienceItem { company:string; role:string; period:string; location:string; type:string; summary:string[]; systems:string[]; reflection:string; evidenceUrl:string }
+export interface Project { slug:string; title:string; category:string; status:string; oneLine:string; stack:string[]; github:string; demo:string; placeholder?:boolean }
+export interface Skill { name:string; level:string }
 
 export const siteConfig = {
   person: {
-    name: "Rakesh Kumar Behera",
-    shortName: "Rakesh",
-    monogram: "RKB",
-    role: "Electrical Engineering Graduate | Industrial Systems & Software Builder",
-    headline: "Engineering reliable systems \u2014 from the factory floor to the web.",
-    altHeadline:
-      "I build dependable systems at the intersection of electrical engineering, industrial operations, and software.",
-    heroParagraph:
-      "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, industrial safety, and automation / SCADA learning. Also building toward backend systems, Rust, APIs, and practical web products with a focus on reliability, clarity, and system behavior.",
-    bio:
-      "Electrical Engineering graduate with hands-on industrial exposure in quality inspection, industrial safety, automation and SCADA learning. I also build modern software products and backend systems using Rust and web technologies.",
-    location: "India",
-    availability: "Open to opportunities",
-    availabilityLine: "Based in India \u2014 available for remote and on-site opportunities.",
-    // TODO: fill these in — leave blank until real.
-    email: "",
-    github: "",
-    linkedin: "",
-    resumeUrl: "", // e.g. "/docs/rakesh-behera-resume.pdf"
+    name: "Rakesh Kumar Behera", shortName: "Rakesh", monogram: "RKB",
+    role: "Electrical Engineering Graduate | Quality, Automation & Industrial Maintenance",
+    headline: "Engineering reliable systems from the factory floor to software.",
+    altHeadline: "Electrical engineer, industrial systems learner and software builder.",
+    heroParagraph: "Electrical Engineering graduate with hands-on automotive quality control experience, industrial electrical exposure, and Siemens SCADA training. I work across inspection, automation, power systems and practical software, with a focus on reliable behavior and clear documentation.",
+    bio: "Electrical Engineering graduate (2026) with hands-on experience in automotive quality control at Sakthi Auto Component Limited and industrial electrical systems at SAIL Rourkela Steel Plant. Trained in Siemens WinCC and TIA Portal SCADA at CTTC Bhubaneswar.",
+    location: "India", availability: "Open to opportunities", availabilityLine: "Based in India, available for remote and on-site opportunities.",
+    email: "rakesh.ku.behera@outlook.in", phone: "+91-9337739502", github: "", linkedin: "", resumeUrl: "/api/resume",
   },
-
   nav: [
-    { label: "Work", href: "/projects" },
-    { label: "Experience", href: "/experience" },
-    { label: "About", href: "/about" },
-    { label: "Skills", href: "/skills" },
-    { label: "Resume", href: "/resume" },
-    { label: "Contact", href: "/contact" },
-  ] as NavItem[],
-
-  social: [
-    { label: "GitHub", href: "" },
-    { label: "LinkedIn", href: "" },
-    { label: "Email", href: "" },
-  ] as SocialLink[],
-
-  opportunities: [
-    "Graduate Electrical Engineer roles",
-    "Electrical maintenance and industrial engineering roles",
-    "Automation / SCADA trainee roles",
-    "Quality and manufacturing engineering roles",
-    "Technical operations roles",
-    "Junior backend / systems-development opportunities",
-    "Remote internships and early-stage product roles",
+    {label:"Work",href:"/projects"},{label:"Experience",href:"/experience"},{label:"About",href:"/about"},{label:"Skills",href:"/skills"},{label:"Resume",href:"/resume"},{label:"Contact",href:"/contact"}
   ],
-
+  social: [
+    {label:"GitHub",href:""},{label:"LinkedIn",href:""},{label:"Email",href:"mailto:rakesh.ku.behera@outlook.in"}
+  ],
+  opportunities: ["Quality Inspector","Technical Support Assistant","Industrial Electrician","Manufacturing Trainee","Automation / SCADA roles","Graduate Electrical Engineer","Junior software opportunities"],
   home: {
-    credibility: [
-      "Electrical Engineering",
-      "Industrial Quality Exposure",
-      "Automation & SCADA Learning",
-      "Rust & Backend Systems",
-      "Available for Opportunities",
+    credibility:["Electrical Engineering","Automotive Quality Control","Siemens SCADA","Industrial Maintenance","Programming & Simulation"],
+    approach:[
+      {title:"Observe the system",body:"Read its inputs, constraints, failure modes and operating context before changing it."},
+      {title:"Measure what matters",body:"Use inspection, testing and signal data to replace assumptions with evidence."},
+      {title:"Document the decision",body:"Make results, tradeoffs and next actions clear enough for the next person to continue."}
     ],
-    approach: [
-      {
-        title: "Observe the system",
-        body: "Understand how a system actually behaves \u2014 its inputs, constraints, failure modes, and edges \u2014 before changing anything.",
-      },
-      {
-        title: "Build with constraints",
-        body: "Design around real limits: safety, reliability, cost, and time. Constraints sharpen decisions instead of blocking them.",
-      },
-      {
-        title: "Document what matters",
-        body: "Capture decisions, tradeoffs, and state so the work stays legible to the next person \u2014 including future me.",
-      },
-    ],
-    finalCta: {
-      headline: "Have a system worth improving?",
-      body: "Recruiters, engineering teams, and collaborators \u2014 let\u2019s connect around dependable, systems-oriented work.",
-    },
+    finalCta:{headline:"Have a system worth improving?",body:"Let us talk about dependable industrial, electrical and software work."}
   },
-
   about: {
-    intro:
-      "I\u2019m an Electrical Engineering graduate who likes systems \u2014 how they\u2019re wired, how they fail, and how to make them dependable. My path runs through the factory floor and into software, and I treat both as the same discipline: understand the system, respect the constraints, and document the decisions.",
-    whyEngineering:
-      "Electrical engineering taught me to think in terms of signals, loads, and safety margins \u2014 systems that either work reliably or fail with consequences. That mindset carries into everything I build.",
-    industrialToSoftware:
-      "On the industrial side I\u2019ve worked around quality inspection, hardness testing, and safety-driven procedures. On the software side I\u2019m building toward backend and systems development with Rust, APIs, and web technologies. I see them as complementary strengths, not separate tracks.",
-    principles: [
-      "Reliability over cleverness.",
-      "Make state and decisions visible.",
-      "Safety and correctness first.",
-      "Keep it honest \u2014 no invented claims.",
-    ],
-    currentFocus: [
-      "Deepening Rust and backend fundamentals",
-      "Studying industrial automation and SCADA concepts",
-      "Designing the Lumino XP architecture (in progress)",
-    ],
-    beyondWork:
-      "[Confirm / add details] \u2014 add a short, human line here about interests outside of work.",
+    intro:"I am Rakesh Kumar Behera, an Electrical Engineering graduate working at the intersection of industrial quality, automation, electrical systems and software. I like understanding why a system behaves the way it does, then making that behavior safer, clearer and more dependable.",
+    whyEngineering:"Electrical engineering taught me to think in circuits, signals, loads, protection and safety margins. Industrial experience added inspection discipline, maintenance awareness and respect for procedures.",
+    industrialToSoftware:"Siemens SCADA training, MATLAB simulation and programming in C++, Java and Python let me carry that systems mindset into interfaces, automation logic and software tools.",
+    principles:["Reliability before novelty.","Evidence before assumptions.","Safety and correctness first.","Clear records make stronger systems."],
+    currentFocus:["Siemens WinCC and TIA Portal","Industrial quality and dimensional inspection","Electrical maintenance and power systems","Programming and simulation"],
+    beyondWork:"I enjoy translating technical ideas into clean interfaces, diagrams and documentation that people can actually use."
   },
-
   experience: [
-    {
-      company: "Sakthi Auto Component Ltd (SACL)",
-      role: "Electrical / Quality Control Intern",
-      period: "Dec 2025 \u2013 Apr 2026",
-      location: "Tiruppur, India",
-      type: "Internship",
-      summary: [
-        "Assisted with quality inspection of steering-knuckle components",
-        "Performed or supported hardness-testing activities and recording results",
-        "Inspected components for visible quality issues such as defects, burrs, porosity, rust, or machining-related issues",
-        "Supported inspection documentation and non-conformance / rejection records",
-      ],
-      systems: ["Quality inspection", "Hardness testing", "Non-conformance documentation"],
-      reflection:
-        "Reinforced how disciplined inspection and clear records protect downstream reliability.",
-      evidenceUrl: "",
-    },
-    {
-      company: "Central Tool Room & Training Centre (CTTC)",
-      role: "Industrial Automation and SCADA Trainee",
-      period: "Jun 2025",
-      location: "Bhubaneswar, India",
-      type: "Technical Training",
-      summary: [
-        "Learned fundamentals of industrial automation and SCADA",
-        "Studied control-system and automation concepts",
-      ],
-      systems: ["Industrial automation", "SCADA fundamentals", "Control systems"],
-      reflection:
-        "Connected classroom control theory to how real automation and monitoring systems are structured.",
-      evidenceUrl: "",
-    },
-    {
-      company: "SAIL \u2014 Rourkela Steel Plant",
-      role: "Vocational Industrial Trainee",
-      period: "Jun 2024 \u2013 Jul 2024",
-      location: "Rourkela, India",
-      type: "Vocational Training",
-      summary: [
-        "Learned about electrical installations, transformers, motors, and control panels",
-        "Built safety awareness around PPE, lockout / tagout, and SOP-driven work",
-        "Gained exposure to electrical distribution, instrumentation, and energy-management learning",
-      ],
-      systems: ["Transformers & motors", "Control panels", "Electrical distribution", "Industrial safety"],
-      reflection:
-        "Saw first-hand how safety discipline and SOPs keep heavy electrical systems dependable.",
-      evidenceUrl: "",
-    },
-    {
-      company: "Education",
-      role: "B.Tech / Bachelor\u2019s in Electrical Engineering",
-      period: "\u2014 2026",
-      location: "India",
-      type: "Education",
-      summary: [
-        "Core electrical engineering foundation: circuits, machines, control, and power systems",
-        "Building software and systems skills alongside the degree",
-      ],
-      systems: ["Circuits", "Electrical machines", "Control systems", "Power systems"],
-      reflection: "The through-line: reliable systems, whether electrical or software.",
-      evidenceUrl: "",
-    },
+    {company:"Sakthi Auto Component Limited",role:"Intern - Electrical (Quality Control Department)",period:"Dec 2025 - Apr 2026",location:"Tiruppur, Tamil Nadu",type:"Manufacturing internship",summary:["Inspected 1,000+ steering knuckle components weekly using vernier caliper and micrometer.","Conducted hardness testing and identified cracks, porosity, burrs and corrosion.","Maintained daily inspection and rejection records for root cause analysis."],systems:["Dimensional inspection","Hardness testing","Defect analysis","Control plans"],reflection:"Built a practical understanding of how disciplined inspection and records prevent non-conforming dispatch.",evidenceUrl:""},
+    {company:"Central Tool Room & Training Centre (MSME)",role:"Industrial Automation Trainee - SCADA",period:"Jun 2025",location:"Bhubaneswar, Odisha",type:"Technical training",summary:["Completed 120+ hours using Siemens WinCC and WinCC Flexible.","Covered system configuration, alarm management, tag logging and real-time monitoring.","Designed HMI interfaces in TIA Portal and configured multi-user SCADA projects."],systems:["Siemens WinCC","TIA Portal","HMI design","Alarm logging"],reflection:"Connected control theory with the state, alarms and interfaces operators depend on.",evidenceUrl:""},
+    {company:"SAIL - Rourkela Steel Plant",role:"Summer Intern - Electrical",period:"Jun 2024 - Jul 2024",location:"Rourkela, Odisha",type:"Vocational training",summary:["Observed high-voltage installations across 3+ substations.","Studied transformers, motors, control panels, load balancing and energy efficiency.","Followed LOTO, PPE and industrial safety protocols."],systems:["Transformers","Induction motors","Control panels","Electrical distribution"],reflection:"Saw how protection, maintenance routines and safety procedures hold heavy electrical systems together.",evidenceUrl:""},
+    {company:"Biju Patnaik University of Technology",role:"Bachelor of Technology in Electrical Engineering",period:"Nov 2022 - Jun 2026",location:"Rourkela, Odisha",type:"Education",summary:["Electrical machines, power systems, network theory, control systems and power electronics.","CGPA 7.31."],systems:["Power systems","Machines","Control","Network theory"],reflection:"The academic base behind my industrial and software systems work.",evidenceUrl:""}
   ] as ExperienceItem[],
-
-  education: {
-    degree: "B.Tech / Bachelor\u2019s degree in Electrical Engineering",
-    completion: "2026",
-    location: "India",
-    institution: "[Confirm / add details]",
-    cgpa: "7.19",
-    showCgpa: true,
-  },
-
+  education:{degree:"Bachelor of Technology in Electrical Engineering",completion:"Jun 2026",location:"Rourkela, Odisha",institution:"Biju Patnaik University of Technology (BPUT)",cgpa:"7.31",showCgpa:true,
+    higherSecondary:"Government Higher Secondary School, Rourkela",highSchool:"Chinmaya Vidyalaya, Sec-7, Rourkela"},
   projects: [
-    {
-      slug: "lumino-xp",
-      title: "Lumino XP",
-      category: "Product concept / backend & systems",
-      status: "In progress",
-      oneLine:
-        "An online test / CBT-platform direction being explored with careful attention to system design and Rust-backend interest.",
-      stack: ["Rust [Confirm / add details]", "APIs [Confirm / add details]", "Web systems"],
-      github: "",
-      demo: "",
-      placeholder: false,
-    },
-    {
-      slug: "project-2",
-      title: "Project 2",
-      category: "Placeholder",
-      status: "Planned",
-      oneLine: "Project slot reserved for a real, verified build.",
-      stack: ["[Confirm / add details]"],
-      github: "",
-      demo: "",
-      placeholder: true,
-    },
-    {
-      slug: "project-3",
-      title: "Project 3",
-      category: "Placeholder",
-      status: "Planned",
-      oneLine: "Add a second verified build here.",
-      stack: ["[Confirm / add details]"],
-      github: "",
-      demo: "",
-      placeholder: true,
-    },
+    {slug:"lumino-xp",title:"Lumino XP",category:"Product concept / backend systems",status:"In progress",oneLine:"An online testing platform direction focused on trustworthy state handling, clear candidate flows and backend architecture.",stack:["Rust direction","APIs","Web systems"],github:"",demo:"",placeholder:false},
+    {slug:"scada-process-monitoring",title:"SCADA Process Monitoring",category:"Industrial automation",status:"Completed simulation",oneLine:"An industrial process monitoring system with tag logging, alarm handling and a real-time HMI dashboard.",stack:["Siemens WinCC","TIA Portal","HMI"],github:"",demo:"",placeholder:false},
+    {slug:"electrical-load-analysis",title:"Electrical Load Analysis",category:"Power systems / simulation",status:"Completed simulation",oneLine:"MATLAB simulation of voltage-current behavior and system performance under varying electrical loads.",stack:["MATLAB","Load analysis","Simulation"],github:"",demo:"",placeholder:false}
   ] as Project[],
-
   skills: {
-    intro:
-      "Framed honestly. Levels reflect real exposure, not inflated claims \u2014 from hands-on work to active learning.",
-    electricalIndustrial: [
-      { name: "Electrical engineering fundamentals", level: "Working knowledge" },
-      { name: "Industrial safety awareness", level: "Industrial exposure" },
-      { name: "Quality inspection exposure", level: "Hands-on exposure" },
-      { name: "Hardness-testing exposure", level: "Hands-on exposure" },
-      { name: "Automation and SCADA learning", level: "Learning" },
-    ] as Skill[],
-    softwareSystems: [
-      { name: "Rust", level: "Learning" },
-      { name: "Backend development", level: "Learning" },
-      { name: "APIs", level: "Learning" },
-      { name: "Web systems", level: "Learning" },
-      { name: "Cloud deployment learning", level: "Learning" },
-    ] as Skill[],
-    toolsWorkflow: [
-      { name: "Documentation", level: "Hands-on exposure" },
-      { name: "Git / GitHub", level: "[Confirm / add details]" },
-      { name: "HTML / CSS / JavaScript / TypeScript", level: "[Confirm / add details]" },
-    ] as Skill[],
+    intro:"Capability is shown with context, not inflated percentages.",
+    electricalIndustrial:[{name:"Transformers and induction motors",level:"Working knowledge"},{name:"Control panels and circuit analysis",level:"Working knowledge"},{name:"Dimensional inspection",level:"Hands-on"},{name:"Hardness and defect testing",level:"Hands-on"},{name:"Industrial safety and LOTO",level:"Industrial exposure"}] as Skill[],
+    softwareSystems:[{name:"Siemens WinCC / WinCC Flexible",level:"Trained"},{name:"TIA Portal and HMI design",level:"Trained"},{name:"MATLAB simulation",level:"Working knowledge"},{name:"C++ and Java OOP",level:"Working knowledge"},{name:"Python scripting",level:"Working knowledge"}] as Skill[],
+    toolsWorkflow:[{name:"Vernier caliper and micrometer",level:"Hands-on"},{name:"NI Multisim",level:"Working knowledge"},{name:"MS Excel and Word",level:"Working knowledge"},{name:"Inspection records",level:"Hands-on"}] as Skill[]
   },
-
-  now: {
-    updated: "[Add date]",
-    focus: [
-      "Deepening Rust and backend fundamentals",
-      "Studying industrial automation and SCADA concepts",
-      "Planning the Lumino XP architecture",
-    ],
-    log: [
-      {
-        date: "[Add date]",
-        note: "Starter entry \u2014 replace with a real update. Keep this log as a concise engineering notebook.",
-      },
-    ],
-  },
-
-  resume: {
-    note: "An HTML summary is below. Add a downloadable PDF via person.resumeUrl in content/site-config.ts.",
-  },
-
-  seo: {
-    defaultDescription:
-      "Portfolio of Rakesh Kumar Behera \u2014 Electrical Engineering graduate building reliable industrial and software systems: quality inspection, automation & SCADA learning, and Rust / backend systems.",
-    keywords: [
-      "Rakesh Kumar Behera",
-      "Electrical Engineer",
-      "Industrial Systems",
-      "SCADA",
-      "Automation",
-      "Rust",
-      "Backend Developer",
-      "Portfolio",
-    ],
-  },
+  now:{updated:"July 2026",focus:["Industrial automation and SCADA","Quality engineering and inspection","Electrical systems and maintenance","Practical software and simulation"],log:[{date:"July 2026",note:"Building this portfolio as a clear record of verified industrial, electrical and software work."}]},
+  resume:{note:"The web resume below is built from the verified resume. Use Download Resume for a portable PDF copy."},
+  honors:["First Position - Interdepartmental Project Expo (2025): bidirectional AC-DC power system.","Industrial Automation & SCADA Training (2025), CTTC Bhubaneswar.","Vocational Industrial Training (2024), SAIL Rourkela Steel Plant."],
+  seo:{defaultDescription:"Portfolio of Rakesh Kumar Behera, Electrical Engineering graduate with experience in quality control, Siemens SCADA, industrial electrical systems and software.",keywords:["Rakesh Kumar Behera","Electrical Engineer","Quality Control","Siemens WinCC","TIA Portal","SCADA","Industrial Maintenance","MATLAB"]}
 };
-
-export type SiteConfig = typeof siteConfig;
+export type SiteConfig=typeof siteConfig;
