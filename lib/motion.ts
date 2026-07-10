@@ -1,10 +1,10 @@
-// Lightweight, CSS-first motion helpers.
-// The visual system favors CSS/SVG animation over heavy JS libraries,
-// and everything here degrades under `prefers-reduced-motion` via globals.css.
-
-export const reveal = "animate-fade-up";
-
-// Staggered reveal delay helper for lists of cards.
-export function revealDelay(index: number): React.CSSProperties {
-  return { animationDelay: `${Math.min(index, 8) * 60}ms` };
-}
+/**
+ * Lightweight, framework-agnostic motion tokens.
+ *
+ * Animations are implemented with CSS (see app/globals.css) rather than a heavy
+ * animation library, and always degrade gracefully under `prefers-reduced-motion`.
+ */
+export const motion = {
+  durations: { fast: 150, base: 250, slow: 400 },
+  easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+};

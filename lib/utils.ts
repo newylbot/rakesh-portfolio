@@ -1,8 +1,7 @@
+/**
+ * Minimal className combiner. Filters out falsy values and joins with a space.
+ * Keeps the dependency footprint small (no clsx / tailwind-merge required).
+ */
 export function cn(...classes: Array<string | false | null | undefined>): string {
   return classes.filter(Boolean).join(" ");
-}
-
-export function siteUrl(path = ""): string {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}${path}`;
 }
