@@ -2,167 +2,106 @@
 
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/content/site-config";
-import { isReal } from "@/lib/utils";
 
-type Status = "idle" | "error" | "success";
+type Status = "idle" | "submitting" | "success" | "error";
 
-type Errors = { name?: string; email?: string; message?: string };
+const endpoint = process.env.NEXT_PUBLIC_CONTACT_FORM_ENDPOINT || "";
 
-export function ContactForm({ endpointConfigured }: { endpointConfigured: boolean }) {
-  const [values, setValues] = useState({ name: "", email: "", message: "" });
-  const [errors, setErrors] = useState<Errors>({});
+export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const email = siteConfig.person.email;
-
-  function validate(): boolean {
-    const next: Errors = {};
-    if (!values.name.trim()) next.name = "Please enter your name.";
-    if (!values.email.trim()) {
-      next.email = "Please enter your email.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      next.email = "Please enter a valid email address.";
-    }
-    if (!values.message.trim()) next.message = "Please enter a message.";
-    setErrors(next);
-    return Object.keys(next).length === 0;
+  function validate(data: FormData) {
+    const next: Record<string, string> = {};
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const message = String(data.get("message") || "").trim();
+    if (!name) next.name = "Please enter your name.";
+    if (!email) next.email = "Please enter your email.";
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) next.email = "Please enter a valid email address.";
+    if (message.length < 10) next.message = "Please add a little more detail (10+ characters).";
+    return next;
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("idle");
-    if (!validate()) return;
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const found = validate(data);
+    setErrors(found);
+    if (Object.keys(found).length > 0) return;
 
-    // If a real backend endpoint is configured, post to it.
-    if (endpointConfigured) {
-      try {
-        setSubmitting(true);
-        const res = await fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
-        if (!res.ok) throw new Error("Request failed");
-        setStatus("success");
-        setValues({ name: "", email: "", message: "" });
-      } catch {
-        setStatus("error");
-      } finally {
-        setSubmitting(false);
-      }
+    // Honeypot spam protection: real users leave this empty.
+    if (String(data.get("company") || "")) return;
+
+    if (!endpoint) {
+      // No real backend connected yet — be honest, do not fake a send.
+      setStatus("error");
       return;
     }
 
-    // No backend yet: fall back to a mailto draft when an email exists,
-    // otherwise show an honest placeholder success state.
-    if (isReal(email)) {
-      const subject = encodeURIComponent(`Portfolio contact from ${values.name}`);
-      const body = encodeURIComponent(`${values.message}\n\nFrom: ${values.name} (${values.email})`);
-      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    try {
+      setStatus("submitting");
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(Object.fromEntries(data.entries())),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setStatus("success");
+      form.reset();
+    } catch {
+      setStatus("error");
     }
-    setStatus("success");
   }
 
-  const fieldClass =
-    "w-full rounded-md border border-border bg-surface px-4 py-3 text-text placeholder:text-text-muted/60 focus-visible:outline-2";
+  const inputClass =
+    "w-full rounded-md border border-border bg-surface px-4 py-3 text-text placeholder:text-text-muted/60 focus-visible:border-primary";
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
-      {!endpointConfigured ? (
-        <p className="rounded-md border border-border bg-surface-2 px-4 py-3 text-sm text-text-muted">
-          {isReal(email)
-            ? "This form opens a pre-filled email in your mail app. A backend endpoint can be added later."
-            : "Note: no contact backend or email is configured yet. Submissions are validated locally as a placeholder until CONTACT_FORM_ENDPOINT and a real email are set."}
-        </p>
-      ) : null}
-
-      <div>
-        <label htmlFor="name" className="mb-2 block text-sm font-medium">
-          Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          autoComplete="name"
-          value={values.name}
-          onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
-          aria-invalid={!!errors.name}
-          aria-describedby={errors.name ? "name-error" : undefined}
-          className={fieldClass}
-        />
-        {errors.name ? (
-          <p id="name-error" role="alert" className="mt-1.5 text-sm text-error">
-            {errors.name}
-          </p>
-        ) : null}
+    <form onSubmit={onSubmit} noValidate className="space-y-5">
+      {/* honeypot */}
+      <div className="hidden" aria-hidden>
+        <label>Company<input type="text" name="company" tabIndex={-1} autoComplete="off" /></label>
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-2 block text-sm font-medium">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          value={values.email}
-          onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
-          aria-invalid={!!errors.email}
-          aria-describedby={errors.email ? "email-error" : undefined}
-          className={fieldClass}
-        />
-        {errors.email ? (
-          <p id="email-error" role="alert" className="mt-1.5 text-sm text-error">
-            {errors.email}
-          </p>
-        ) : null}
+        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-text">Name</label>
+        <input id="name" name="name" type="text" autoComplete="name" className={inputClass}
+          aria-invalid={!!errors.name} aria-describedby={errors.name ? "name-error" : undefined} />
+        {errors.name && <p id="name-error" className="mt-1.5 text-sm text-error">{errors.name}</p>}
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-2 block text-sm font-medium">
-          Message
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={5}
-          value={values.message}
-          onChange={(e) => setValues((v) => ({ ...v, message: e.target.value }))}
-          aria-invalid={!!errors.message}
-          aria-describedby={errors.message ? "message-error" : undefined}
-          className={fieldClass}
-        />
-        {errors.message ? (
-          <p id="message-error" role="alert" className="mt-1.5 text-sm text-error">
-            {errors.message}
-          </p>
-        ) : null}
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text">Email</label>
+        <input id="email" name="email" type="email" autoComplete="email" className={inputClass}
+          aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} />
+        {errors.email && <p id="email-error" className="mt-1.5 text-sm text-error">{errors.email}</p>}
       </div>
 
-      {/* Honeypot spam-protection placeholder (hidden from users) */}
-      <div className="hidden" aria-hidden="true">
-        <label htmlFor="company">Company</label>
-        <input id="company" name="company" tabIndex={-1} autoComplete="off" />
+      <div>
+        <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-text">Message</label>
+        <textarea id="message" name="message" rows={5} className={inputClass}
+          aria-invalid={!!errors.message} aria-describedby={errors.message ? "message-error" : undefined} />
+        {errors.message && <p id="message-error" className="mt-1.5 text-sm text-error">{errors.message}</p>}
       </div>
 
-      <div className="flex items-center gap-4">
-        <Button variant="primary" type="submit">
-          {submitting ? "Sending…" : "Send message"}
-        </Button>
-        {status === "success" ? (
-          <p role="status" className="text-sm text-success">
-            Thanks — your message is ready to send.
+      <Button type="submit" disabled={status === "submitting"}>
+        {status === "submitting" ? "Sending…" : "Send message"}
+      </Button>
+
+      <div aria-live="polite" className="min-h-[1.5rem]">
+        {status === "success" && (
+          <p className="text-sm text-success">Thanks — your message was sent. I’ll get back to you soon.</p>
+        )}
+        {status === "error" && !endpoint && (
+          <p className="text-sm text-warning">
+            The contact form backend isn’t connected yet. Set NEXT_PUBLIC_CONTACT_FORM_ENDPOINT, or reach out directly once contact links are added.
           </p>
-        ) : null}
-        {status === "error" ? (
-          <p role="alert" className="text-sm text-error">
-            Something went wrong. Please try again later.
-          </p>
-        ) : null}
+        )}
+        {status === "error" && endpoint && (
+          <p className="text-sm text-error">Something went wrong sending your message. Please try again.</p>
+        )}
       </div>
     </form>
   );
