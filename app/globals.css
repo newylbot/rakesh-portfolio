@@ -3,129 +3,109 @@
 @tailwind utilities;
 
 :root {
-  /* Light theme */
-  --bg: #faf7f2;
-  --bg-elevated: #f3eee8;
-  --surface: #ffffff;
-  --surface-2: #f7f2ec;
-  --text: #1c1512;
-  --text-muted: #736b66;
+  --bg: #FAF7F2;
+  --bg-elevated: #F3EEE8;
+  --surface: #FFFFFF;
+  --surface-2: #F7F2EC;
+  --text: #1C1512;
+  --text-muted: #736B66;
   --border: rgba(28, 21, 18, 0.12);
-  --primary: #4f46e5;
-  --secondary: #f97316;
-  --accent: #0d9488;
+  --primary: #4F46E5;
+  --secondary: #F97316;
+  --accent: #0D9488;
   --success: #059669;
-  --warning: #d97706;
-  --error: #dc2626;
+  --warning: #D97706;
+  --error: #DC2626;
 }
 
 .dark {
-  /* Dark theme */
-  --bg: #0e0b16;
-  --bg-elevated: #1a1525;
-  --surface: #1e1a2e;
+  --bg: #0E0B16;
+  --bg-elevated: #1A1525;
+  --surface: #1E1A2E;
   --surface-2: #262038;
-  --text: #f5f0ff;
-  --text-muted: #a8a0b8;
+  --text: #F5F0FF;
+  --text-muted: #A8A0B8;
   --border: rgba(245, 240, 255, 0.12);
-  --primary: #00e5ff;
-  --secondary: #8b5cf6;
-  --accent: #fbbf24;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
+  --primary: #00E5FF;
+  --secondary: #8B5CF6;
+  --accent: #FBBF24;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
 }
 
-* {
-  border-color: var(--border);
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--bg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
+@layer utilities {
+  .container-content {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Subtle engineering grain overlay */
+  .grain::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .hairline {
+    border-top: 1px solid var(--border);
+  }
+
+  .trace-divider {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-feature-settings: "ss01", "cv01";
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Subtle engineering grain overlay */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Focus visibility */
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Skip link */
-.skip-link {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  z-index: 100;
-  padding: 0.75rem 1.25rem;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-.skip-link:focus {
-  left: 1rem;
-  top: 1rem;
-}
-
-/* Mono readout label */
-.readout {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Hairline divider with gradient */
-.hairline {
-  height: 1px;
-  width: 100%;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--border) 20%,
-    var(--border) 80%,
-    transparent
-  );
-}
-
-/* Print styles for resume */
 @media print {
-  body::before { display: none; }
-  .no-print { display: none !important; }
-  body { background: #fff; color: #000; }
-  @page { size: A4; margin: 16mm; }
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
 }

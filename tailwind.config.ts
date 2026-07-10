@@ -54,7 +54,7 @@ const config: Config = {
         dash: {
           to: { "stroke-dashoffset": "0" },
         },
-        pulse-trace: {
+        "pulse-trace": {
           "0%": { opacity: "0.2" },
           "50%": { opacity: "1" },
           "100%": { opacity: "0.2" },
