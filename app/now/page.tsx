@@ -1,4 +1,1 @@
-import { createMetadata } from "@/lib/seo";
-import { NowExperience } from "@/components/pages/animated-pages";
-export const metadata=createMetadata({title:"Now",path:"/now"});
-export default function Page(){return <NowExperience/>}
+import {createMetadata} from "@/lib/seo";import {NowExperience} from "@/components/pages/animated-pages";import {RouteCta} from "@/components/pages/route-cta";export const metadata=createMetadata({title:"Now",path:"/now"});export default function Page(){return <div className="page-custom-cta"><NowExperience/><RouteCta kicker="Learning loop" title="WHAT SHOULD I STUDY OR BUILD NEXT?" body="Recommendations, collaboration ideas and technical conversations are welcome."/></div>}

@@ -1,4 +1,1 @@
-import { createMetadata } from "@/lib/seo";
-import { SkillsExperience } from "@/components/pages/animated-pages";
-export const metadata=createMetadata({title:"Skills",path:"/skills"});
-export default function Page(){return <SkillsExperience/>}
+import {createMetadata} from "@/lib/seo";import {SkillsExperience} from "@/components/pages/animated-pages";import {TechnicalDomainMap} from "@/components/skills/technical-domain-map";export const metadata=createMetadata({title:"Skills",path:"/skills"});export default function Page(){return <div className="page-custom-cta"><SkillsExperience/><TechnicalDomainMap/></div>}

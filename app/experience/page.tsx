@@ -1,4 +1,1 @@
-import { createMetadata } from "@/lib/seo";
-import { ExperienceExperience } from "@/components/pages/animated-pages";
-export const metadata=createMetadata({title:"Experience",path:"/experience"});
-export default function Page(){return <ExperienceExperience/>}
+import {createMetadata} from "@/lib/seo";import {ExperienceExperience} from "@/components/pages/animated-pages";import {RouteCta} from "@/components/pages/route-cta";export const metadata=createMetadata({title:"Experience",path:"/experience"});export default function Page(){return <div className="page-custom-cta"><ExperienceExperience/><RouteCta kicker="Next assignment" title="PUT THIS FIELD EXPERIENCE TO WORK." body="Open to quality, automation, maintenance and graduate electrical opportunities."/></div>}
