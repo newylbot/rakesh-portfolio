@@ -46,7 +46,7 @@ export const siteConfig = {
  education:{degree:"Bachelor of Technology in Electrical Engineering",completion:"Jun 2026",location:"Rourkela, Odisha",institution:"Biju Patnaik University of Technology (BPUT)",cgpa:"7.31",showCgpa:true,
  higherSecondary:"Government Higher Secondary School, Rourkela",highSchool:"Chinmaya Vidyalaya, Sec-7, Rourkela"},
  projects: [
- {slug:"lumino-xp",title:"ColTest",category:"Product concept / backend systems",status:"In progress",oneLine:"An online testing platform direction focused on trustworthy state handling, clear candidate flows and backend architecture.",stack:["Rust direction","APIs","Web systems"],github:"",demo:"",placeholder:false},
+ {slug:"coltest",title:"ColTest",category:"Product concept / backend systems",status:"In progress",oneLine:"An online testing platform direction focused on trustworthy state handling, clear candidate flows and backend architecture.",stack:["Rust direction","APIs","Web systems"],github:"",demo:"",placeholder:false},
  {slug:"scada-process-monitoring",title:"SCADA Process Monitoring",category:"Industrial automation",status:"Completed simulation",oneLine:"An industrial process monitoring system with tag logging, alarm handling and a real-time HMI dashboard.",stack:["Siemens WinCC","TIA Portal","HMI"],github:"",demo:"",placeholder:false},
  {slug:"electrical-load-analysis",title:"Electrical Load Analysis",category:"Power systems / simulation",status:"Completed simulation",oneLine:"MATLAB simulation of voltage-current behavior and system performance under varying electrical loads.",stack:["MATLAB","Load analysis","Simulation"],github:"",demo:"",placeholder:false}
  ] as Project[],
