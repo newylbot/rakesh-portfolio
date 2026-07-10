@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Github, FileText, Award, BookOpen } from "lucide-react";
 import { siteConfig } from "@/content/site-config";
 import { Section, SectionHeader } from "@/components/layout/section";
@@ -8,7 +9,7 @@ function Module({
   href,
   fallback,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   href: string;
   fallback: string;

@@ -1,43 +1,41 @@
 import { NextResponse } from "next/server";
 
 /**
- * Forwards contact submissions to a real backend endpoint.
- * Only active when CONTACT_FORM_ENDPOINT is set. No fake backend is used.
+ * Contact endpoint.
+ * - Forwards to CONTACT_FORM_ENDPOINT when configured.
+ * - Returns 501 (not implemented) when no backend is set, so the UI can ask
+ *   visitors to email directly instead of faking a submission.
  */
 export async function POST(request: Request) {
   const endpoint = process.env.CONTACT_FORM_ENDPOINT;
-  if (!endpoint) {
-    return NextResponse.json(
-      { error: "Contact endpoint is not configured." },
-      { status: 501 }
-    );
-  }
 
-  let body: unknown;
+  let payload: { name?: string; email?: string; message?: string };
   try {
-    body = await request.json();
+    payload = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { name, email, message, company } = (body ?? {}) as Record<string, string>;
-
-  // Honeypot: silently accept and drop obvious bots.
-  if (company) return NextResponse.json({ ok: true });
-
+  const { name, email, message } = payload ?? {};
   if (!name || !email || !message) {
-    return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  if (!endpoint) {
+    return NextResponse.json({ error: "Contact endpoint not configured." }, { status: 501 });
   }
 
   try {
     const res = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ name, email, message }),
     });
-    if (!res.ok) throw new Error("Upstream failed");
+    if (!res.ok) {
+      return NextResponse.json({ error: "Upstream error" }, { status: 502 });
+    }
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "Failed to deliver message." }, { status: 502 });
+    return NextResponse.json({ error: "Upstream error" }, { status: 502 });
   }
 }

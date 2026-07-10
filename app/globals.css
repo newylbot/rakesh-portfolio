@@ -2,106 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens as space-separated RGB channels so Tailwind opacity modifiers
+ * work (e.g. bg-primary/20). Light theme is the default; .dark overrides.
+ */
 :root {
-  --bg: #FAF7F2;
-  --bg-elevated: #F3EEE8;
-  --surface: #FFFFFF;
-  --surface-2: #F7F2EC;
-  --text: #1C1512;
-  --text-muted: #736B66;
-  --border: rgba(28, 21, 18, 0.12);
-  --primary: #4F46E5;
-  --secondary: #F97316;
-  --accent: #0D9488;
-  --success: #059669;
-  --warning: #D97706;
-  --error: #DC2626;
+  --bg: 250 247 242;
+  --bg-elevated: 243 238 232;
+  --surface: 255 255 255;
+  --surface-2: 247 242 236;
+  --text: 28 21 18;
+  --text-muted: 115 107 102;
+  --border: 28 21 18;
+  --primary: 79 70 229;
+  --secondary: 249 115 22;
+  --accent: 13 148 136;
+  --success: 5 150 105;
+  --warning: 217 119 6;
+  --error: 220 38 38;
 }
 
 .dark {
-  --bg: #0E0B16;
-  --bg-elevated: #1A1525;
-  --surface: #1E1A2E;
-  --surface-2: #262038;
-  --text: #F5F0FF;
-  --text-muted: #A8A0B8;
-  --border: rgba(245, 240, 255, 0.12);
-  --primary: #00E5FF;
-  --secondary: #8B5CF6;
-  --accent: #FBBF24;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
+  --bg: 14 11 22;
+  --bg-elevated: 26 21 37;
+  --surface: 30 26 46;
+  --surface-2: 38 32 56;
+  --text: 245 240 255;
+  --text-muted: 168 160 184;
+  --border: 245 240 255;
+  --primary: 0 229 255;
+  --secondary: 139 92 246;
+  --accent: 251 191 36;
+  --success: 16 185 129;
+  --warning: 245 158 11;
+  --error: 239 68 68;
 }
 
 @layer base {
-  * {
-    border-color: var(--border);
-  }
-
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
-
   body {
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: rgb(var(--bg));
+    color: rgb(var(--text));
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-
   ::selection {
-    background: var(--primary);
-    color: var(--bg);
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-}
-
-@layer utilities {
-  .container-content {
-    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
-  }
-
-  /* Subtle engineering grain overlay */
-  .grain::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .hairline {
-    border-top: 1px solid var(--border);
-  }
-
-  .trace-divider {
-    height: 1px;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    background-color: rgb(var(--primary) / 0.25);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
+@layer utilities {
+  /* Subtle grain overlay applied to <body class="grain"> */
+  .grain::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@keyframes trace-pulse {
+  0% {
+    stroke-dashoffset: 240;
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.15;
+  }
+}
+.trace-animate {
+  stroke-dasharray: 240;
+  animation: trace-pulse 7s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media print {
-  header, footer, .no-print {
+  .no-print {
     display: none !important;
   }
   body {

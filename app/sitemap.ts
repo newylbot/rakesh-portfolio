@@ -1,25 +1,14 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/seo";
 import { siteConfig } from "@/content/site-config";
-import { getSiteUrl } from "@/lib/utils";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = getSiteUrl();
   const now = new Date();
-
   const routes = ["", "/about", "/experience", "/projects", "/skills", "/now", "/resume", "/contact"];
-  const staticEntries = routes.map((route) => ({
-    url: `${base}${route}`,
+  const base = routes.map((r) => ({ url: `${siteUrl}${r}`, lastModified: now }));
+  const projects = siteConfig.projects.map((p) => ({
+    url: `${siteUrl}/projects/${p.slug}`,
     lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: route === "" ? 1 : 0.7,
   }));
-
-  const projectEntries = siteConfig.projects.map((p) => ({
-    url: `${base}/projects/${p.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
-
-  return [...staticEntries, ...projectEntries];
+  return [...base, ...projects];
 }
