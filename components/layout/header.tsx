@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { siteConfig } from "@/content/site-config";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,6 @@ export function Header() {
   const [open, setOpen] = React.useState(false);
   const [indicator, setIndicator] = React.useState<Indicator>({ x: 0, scaleX: 1, visible: false });
   const pathname = usePathname();
-  const reduce = useReducedMotion();
   const navRef = React.useRef<HTMLElement>(null);
 
   const measure = React.useCallback((target?: HTMLElement | null) => {
@@ -56,7 +55,7 @@ export function Header() {
     }
     const navBox = nav.getBoundingClientRect();
     const box = active.getBoundingClientRect();
-    setIndicator({ x: box.left - navBox.left + 12, scaleX: Math.max(8, box.width - 24), visible: true });
+    setIndicator({ x: box.left - navBox.left + 5, scaleX: Math.max(16, box.width - 10), visible: true });
   }, []);
 
   React.useEffect(() => setOpen(false), [pathname]);
@@ -88,12 +87,25 @@ export function Header() {
           {siteConfig.nav.map((item) => {
             const active = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} onClick={(event) => measure(event.currentTarget)} className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}>
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                onPointerDown={(event) => measure(event.currentTarget)}
+                onFocus={(event) => measure(event.currentTarget)}
+                className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}
+              >
                 {item.label}
               </Link>
             );
           })}
-          <motion.span aria-hidden="true" className="pointer-events-none absolute bottom-1 left-0 h-[2px] w-px origin-left rounded-full bg-primary" initial={false} animate={{ x: indicator.x, scaleX: indicator.scaleX, opacity: indicator.visible ? 1 : 0 }} transition={reduce ? { duration: 0 } : { duration: .52, ease: [.16, 1, .3, 1] }} />
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-1 left-0 h-[2px] w-px origin-left rounded-full bg-primary"
+            initial={false}
+            animate={{ x: indicator.x, scaleX: indicator.scaleX, opacity: indicator.visible ? 1 : 0 }}
+            transition={{ duration: .62, ease: [.16, 1, .3, 1] }}
+          />
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
