@@ -4,19 +4,14 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { siteConfig } from "@/content/site-config";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 function ProtectionRelayIdentity() {
   return (
-    <svg
-      viewBox="0 0 510 118"
-      className="h-10 w-[9.5rem] overflow-visible sm:w-[10.75rem]"
-      role="img"
-      aria-label="Rakesh"
-    >
+    <svg viewBox="0 0 510 118" className="h-10 w-[9.5rem] overflow-visible sm:w-[10.75rem]" role="img" aria-label="Rakesh">
       <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
         <g strokeWidth="7">
           <path d="M8 103V13h48c29 0 45 13 45 35S85 82 56 82H8M55 82l40 25" />
@@ -26,7 +21,6 @@ function ProtectionRelayIdentity() {
           <path d="M365 50c-11-11-39-13-48 4-12 23 48 20 47 43-1 19-38 22-55 9" />
           <path d="M390 41v62M449 41v62M390 72h59" />
         </g>
-
         <rect x="25" y="30" width="49" height="33" rx="4" stroke="oklch(var(--primary))" strokeWidth="2.4" />
         <path d="M32 46c5-12 10 12 15 0s10 12 15 0" stroke="oklch(var(--primary))" strokeWidth="2.4" />
         <path d="M135 91l10-10 10 10-10 10z" stroke="oklch(var(--primary))" strokeWidth="2" />
@@ -35,62 +29,49 @@ function ProtectionRelayIdentity() {
         <path d="M319 58h13m0-9v18M332 58l16-13M332 58l16 13" stroke="oklch(var(--primary))" strokeWidth="2" />
         <path d="M402 53v13m0 13v13M437 53v13m0 13v13" stroke="oklch(var(--primary))" strokeWidth="2" />
         <path d="M410 72l10-10 10 10-10 10z" stroke="oklch(var(--secondary))" strokeWidth="2" />
-
-        <motion.path
-          d="M8 111H466"
-          stroke="oklch(var(--primary))"
-          strokeWidth="2.5"
-          strokeDasharray="7 13"
-          animate={{ strokeDashoffset: [0, -80] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
-        />
+        <motion.path d="M8 111H466" stroke="oklch(var(--primary))" strokeWidth="2.5" strokeDasharray="7 13" animate={{ strokeDashoffset: [0, -80] }} transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }} />
       </g>
       {[95, 238, 365, 466].map((cx, index) => (
-        <motion.circle
-          key={cx}
-          cx={cx}
-          cy="111"
-          r="3.5"
-          fill={index % 2 ? "oklch(var(--secondary))" : "oklch(var(--primary))"}
-          animate={{ opacity: [.45, 1, .45] }}
-          transition={{ duration: 1.7, repeat: Infinity, delay: index * .18 }}
-        />
+        <motion.circle key={cx} cx={cx} cy="111" r="3.5" fill={index % 2 ? "oklch(var(--secondary))" : "oklch(var(--primary))"} animate={{ opacity: [.45, 1, .45] }} transition={{ duration: 1.7, repeat: Infinity, delay: index * .18 }} />
       ))}
     </svg>
   );
 }
 
+type Indicator = { x: number; scaleX: number; visible: boolean };
+
 export function Header() {
   const [open, setOpen] = React.useState(false);
-  const [indicator, setIndicator] = React.useState({ left: 0, width: 0, visible: false });
+  const [indicator, setIndicator] = React.useState<Indicator>({ x: 0, scaleX: 1, visible: false });
   const pathname = usePathname();
+  const reduce = useReducedMotion();
   const navRef = React.useRef<HTMLElement>(null);
 
-  React.useEffect(() => setOpen(false), [pathname]);
-  React.useLayoutEffect(() => {
+  const measure = React.useCallback((target?: HTMLElement | null) => {
     const nav = navRef.current;
-    if (!nav) return;
-    const active = nav.querySelector<HTMLElement>("[aria-current='page']");
-    if (!active) {
+    const active = target ?? nav?.querySelector<HTMLElement>("[aria-current='page']");
+    if (!nav || !active) {
       setIndicator((value) => ({ ...value, visible: false }));
       return;
     }
     const navBox = nav.getBoundingClientRect();
     const box = active.getBoundingClientRect();
-    setIndicator({ left: box.left - navBox.left + 12, width: Math.max(8, box.width - 24), visible: true });
-  }, [pathname]);
-  React.useEffect(() => {
-    const update = () => {
-      const nav = navRef.current;
-      const active = nav?.querySelector<HTMLElement>("[aria-current='page']");
-      if (!nav || !active) return;
-      const navBox = nav.getBoundingClientRect();
-      const box = active.getBoundingClientRect();
-      setIndicator({ left: box.left - navBox.left + 12, width: Math.max(8, box.width - 24), visible: true });
-    };
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    setIndicator({ x: box.left - navBox.left + 12, scaleX: Math.max(8, box.width - 24), visible: true });
   }, []);
+
+  React.useEffect(() => setOpen(false), [pathname]);
+  React.useLayoutEffect(() => { measure(); }, [pathname, measure]);
+  React.useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const observer = new ResizeObserver(() => measure());
+    observer.observe(nav);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [measure]);
   React.useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -105,9 +86,25 @@ export function Header() {
         <nav ref={navRef} aria-label="Primary" className="relative hidden items-center gap-1 lg:flex">
           {siteConfig.nav.map((item) => {
             const active = pathname === item.href;
-            return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}>{item.label}</Link>;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                onClick={(event) => measure(event.currentTarget)}
+                className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}
+              >
+                {item.label}
+              </Link>
+            );
           })}
-          <span aria-hidden="true" className="pointer-events-none absolute bottom-1 h-[2px] rounded-full bg-primary transition-[transform,width,opacity] duration-500 ease-out-expo" style={{ width: indicator.width, transform: `translate3d(${indicator.left}px,0,0)`, opacity: indicator.visible ? 1 : 0 }} />
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-1 left-0 h-[2px] w-px origin-left rounded-full bg-primary"
+            initial={false}
+            animate={{ x: indicator.x, scaleX: indicator.scaleX, opacity: indicator.visible ? 1 : 0 }}
+            transition={reduce ? { duration: 0 } : { duration: .52, ease: [.16, 1, .3, 1] }}
+          />
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -119,7 +116,15 @@ export function Header() {
           </button>
         </div>
       </div>
-      {open ? <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="border-t border-border bg-bg px-5 py-5 lg:hidden">{siteConfig.nav.map((item, index) => <motion.div key={item.href} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * .035 }}><Link href={item.href} className="block border-b border-border py-3 font-display text-xl text-text">{item.label}</Link></motion.div>)}</motion.nav> : null}
+      {open ? (
+        <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="border-t border-border bg-bg px-5 py-5 lg:hidden">
+          {siteConfig.nav.map((item, index) => (
+            <motion.div key={item.href} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * .035 }}>
+              <Link href={item.href} className="block border-b border-border py-3 font-display text-xl text-text">{item.label}</Link>
+            </motion.div>
+          ))}
+        </motion.nav>
+      ) : null}
     </header>
   );
 }
