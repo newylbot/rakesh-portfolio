@@ -64,12 +64,13 @@ export function Header() {
   React.useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
-    const observer = new ResizeObserver(() => measure());
+    const onWindowResize = () => measure();
+    const observer = new ResizeObserver(onWindowResize);
     observer.observe(nav);
-    window.addEventListener("resize", measure);
+    window.addEventListener("resize", onWindowResize);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", measure);
+      window.removeEventListener("resize", onWindowResize);
     };
   }, [measure]);
   React.useEffect(() => {
@@ -87,24 +88,12 @@ export function Header() {
           {siteConfig.nav.map((item) => {
             const active = pathname === item.href;
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                onClick={(event) => measure(event.currentTarget)}
-                className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}
-              >
+              <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} onClick={(event) => measure(event.currentTarget)} className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}>
                 {item.label}
               </Link>
             );
           })}
-          <motion.span
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-1 left-0 h-[2px] w-px origin-left rounded-full bg-primary"
-            initial={false}
-            animate={{ x: indicator.x, scaleX: indicator.scaleX, opacity: indicator.visible ? 1 : 0 }}
-            transition={reduce ? { duration: 0 } : { duration: .52, ease: [.16, 1, .3, 1] }}
-          />
+          <motion.span aria-hidden="true" className="pointer-events-none absolute bottom-1 left-0 h-[2px] w-px origin-left rounded-full bg-primary" initial={false} animate={{ x: indicator.x, scaleX: indicator.scaleX, opacity: indicator.visible ? 1 : 0 }} transition={reduce ? { duration: 0 } : { duration: .52, ease: [.16, 1, .3, 1] }} />
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
