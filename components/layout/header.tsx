@@ -55,7 +55,8 @@ export function Header() {
     }
     const navBox = nav.getBoundingClientRect();
     const box = active.getBoundingClientRect();
-    setIndicator({ x: box.left - navBox.left + 5, scaleX: Math.max(16, box.width - 10), visible: true });
+    const inset = 8;
+    setIndicator({ x: box.left - navBox.left + inset, scaleX: Math.max(16, box.width - inset * 2), visible: true });
   }, []);
 
   React.useEffect(() => setOpen(false), [pathname]);
