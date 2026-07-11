@@ -54,30 +54,23 @@ export function Header() {
         <Link href="/" className="group flex shrink-0 items-center rounded-md focus-visible:ring-2 focus-visible:ring-primary">
           <ProtectionRelayIdentity />
         </Link>
-
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {siteConfig.nav.map((item) => {
             const active = pathname === item.href;
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}
-              >
+              <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}>
                 {item.label}
                 {active ? (
                   <motion.span
                     layoutId="active-nav"
                     className="absolute inset-x-3 bottom-1 h-[2px] rounded-full bg-primary"
-                    transition={{ type: "spring", stiffness: 380, damping: 34 }}
+                    transition={{ duration: .5, ease: [.16, 1, .3, 1] }}
                   />
                 ) : null}
               </Link>
             );
           })}
         </nav>
-
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: .96 }}>
@@ -88,7 +81,6 @@ export function Header() {
           </button>
         </div>
       </div>
-
       {open ? (
         <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="border-t border-border bg-bg px-5 py-5 lg:hidden">
           {siteConfig.nav.map((item, index) => (
