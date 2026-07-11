@@ -38,45 +38,11 @@ function ProtectionRelayIdentity() {
   );
 }
 
-type Indicator = { x: number; width: number; visible: boolean };
-
 export function Header() {
   const [open, setOpen] = React.useState(false);
-  const [indicator, setIndicator] = React.useState<Indicator>({ x: 0, width: 0, visible: false });
   const pathname = usePathname();
-  const navRef = React.useRef<HTMLElement>(null);
-
-  const measure = React.useCallback((labelEl?: HTMLElement | null) => {
-    const nav = navRef.current;
-    const label = labelEl ?? nav?.querySelector<HTMLElement>("[data-active-label='true']");
-    if (!nav || !label) {
-      setIndicator((value) => ({ ...value, visible: false }));
-      return;
-    }
-    // Measure the label text span, not the padded button, so the bar matches the word exactly.
-    setIndicator({ x: label.offsetLeft, width: label.offsetWidth, visible: true });
-  }, []);
 
   React.useEffect(() => setOpen(false), [pathname]);
-  React.useLayoutEffect(() => { measure(); }, [pathname, measure]);
-  React.useEffect(() => {
-    // Re-measure after web fonts load, since label widths shift on font swap.
-    if (typeof document !== "undefined" && "fonts" in document) {
-      document.fonts.ready.then(() => measure());
-    }
-  }, [measure]);
-  React.useEffect(() => {
-    const nav = navRef.current;
-    if (!nav) return;
-    const onResize = () => measure();
-    const observer = new ResizeObserver(onResize);
-    observer.observe(nav);
-    window.addEventListener("resize", onResize);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", onResize);
-    };
-  }, [measure]);
   React.useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -88,7 +54,8 @@ export function Header() {
         <Link href="/" className="group flex shrink-0 items-center rounded-md focus-visible:ring-2 focus-visible:ring-primary">
           <ProtectionRelayIdentity />
         </Link>
-        <nav ref={navRef} aria-label="Primary" className="relative hidden items-center gap-1 lg:flex">
+
+        <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {siteConfig.nav.map((item) => {
             const active = pathname === item.href;
             return (
@@ -98,24 +65,19 @@ export function Header() {
                 aria-current={active ? "page" : undefined}
                 className={cn("relative rounded-md px-3 py-3 text-sm font-medium text-text-muted transition-colors duration-200 hover:text-text", active && "text-text")}
               >
-                <span
-                  data-active-label={active ? "true" : undefined}
-                  onPointerDown={(event) => measure(event.currentTarget)}
-                  onFocus={(event) => measure(event.currentTarget)}
-                >
-                  {item.label}
-                </span>
+                {item.label}
+                {active ? (
+                  <motion.span
+                    layoutId="active-nav"
+                    className="absolute inset-x-3 bottom-1 h-[2px] rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 380, damping: 34 }}
+                  />
+                ) : null}
               </Link>
             );
           })}
-          <motion.span
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-1 left-0 h-[2px] rounded-full bg-primary"
-            initial={false}
-            animate={{ x: indicator.x, width: indicator.width, opacity: indicator.visible ? 1 : 0 }}
-            transition={{ duration: .55, ease: [.16, 1, .3, 1] }}
-          />
         </nav>
+
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: .96 }}>
@@ -126,6 +88,7 @@ export function Header() {
           </button>
         </div>
       </div>
+
       {open ? (
         <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="border-t border-border bg-bg px-5 py-5 lg:hidden">
           {siteConfig.nav.map((item, index) => (
